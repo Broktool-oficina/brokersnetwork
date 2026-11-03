@@ -18,68 +18,102 @@
 .adm-bar a:hover,.adm-bar button:hover{background:rgba(255,255,255,.18)}
 .adm-bar .sp{margin-left:auto}
 .adm-bar .ok{background:none;color:#9FB0C2;font-weight:500;padding:0 4px}
-</style><nav class="adm-bar" aria-label="Administración"><a href="admin.html">← Panel admin</a><a href="index.html">Sitio</a><span class="ok" id="bnEstado"></span><button class="sp" type="button" id="bnSalir">Cerrar sesión</button></nav>
+</style>
+<nav class="adm-bar" aria-label="Administración"><a href="admin.html">← Panel admin</a><a href="index.html">Sitio</a><span class="ok" id="bnEstado"></span><button class="sp" type="button" id="bnSalir">Cerrar sesión</button></nav>
 <script>
 document.getElementById('bnSalir').onclick=function(){BN.salir();location.replace('admin.html')};
 </script>
-<title>Tracker de afiliaciones</title>
 <style>
-:root{--naranja:#DD5635;--naranja-t:#B8401F;--naranja-c:#FFF1EC;--azul:#30445A;--azul-o2:#1F2D3D;--azul-c:#E7EDF3;--gris:#3B3B3B;--gris-m:#666;--gris-c:#F4F4F4;--linea:#E3E3E3;--ok:#1E8A4C;--f:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--gris:#E6ECF2;--gris-m:#A9B6C4;--gris-c:#18222D;--linea:#2C3A49;--azul:#C9D8EA;--azul-c:#22303F;--naranja-c:#3A2219;--naranja-t:#FF9C7E}:root:not([data-theme="light"]) body{background:#111A23}:root:not([data-theme="light"]) .card,:root:not([data-theme="light"]) .panel,:root:not([data-theme="light"]) .campo{background:#18222D}}
-:root[data-theme="dark"]{--gris:#E6ECF2;--gris-m:#A9B6C4;--gris-c:#18222D;--linea:#2C3A49;--azul:#C9D8EA;--azul-c:#22303F;--naranja-c:#3A2219;--naranja-t:#FF9C7E}
-:root[data-theme="dark"] body{background:#111A23}
-*{box-sizing:border-box}
-body{margin:0;background:#F4F5F7;color:var(--gris);font-family:var(--f);font-size:15px;line-height:1.5}
-.top{background:#1F2D3D;color:#fff;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:4px solid var(--naranja)}
-.top h1{margin:0;font-size:20px}
-.top small{color:#C9D4E0;display:block;font-size:12.5px}
-.top .sp{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
-.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
-.btn{border:0;border-radius:99px;padding:10px 16px;font:700 14px var(--f);cursor:pointer}
+/* Mismo formato que el tracker de operaciones: chips por etapa, tarjetas con color de etapa, botón de mensaje y flechas de avance */
+:root{--naranja:#DD5635;--naranja-t:#B8401F;--naranja-c:#FFF1EC;--azul:#30445A;--gris:#2F2A27;--gris-m:#6B6260;--gris-c:#F4F1EF;--linea:#E3DDD9;--wa:#1F8F4E;--wa-c:#DCF3E5;--bad:#B3362B;--bg:#F6F4F2;--f:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--gris:#E6ECF2;--gris-m:#A9B6C4;--gris-c:#1E2730;--linea:#34414F;--azul:#C9D8EA;--bg:#111A23}:root:not([data-theme="light"]) .card,:root:not([data-theme="light"]) .box,:root:not([data-theme="light"]) .chip,:root:not([data-theme="light"]) .campo,:root:not([data-theme="light"]) .sheet{background:#18222D;color:#E6ECF2}}
+body{margin:0;background:var(--bg);color:var(--gris);font-family:var(--f);font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{padding:18px 16px 4px;max-width:900px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.top h1{margin:0;font-size:1.3rem;color:var(--azul)}
+.top small{color:var(--gris-m);display:block;font-size:.8rem}
+.wrap{max-width:900px;margin:0 auto;padding:12px 16px 60px;display:flex;flex-direction:column;gap:14px}
+.btn{border:0;border-radius:99px;padding:10px 16px;font:700 14px var(--f);cursor:pointer;min-height:40px}
 .btn.nar{background:var(--naranja);color:#fff}
-.btn.lin{background:transparent;border:1.5px solid rgba(255,255,255,.5);color:#fff}
-.btn.sec{background:var(--azul-c);color:var(--azul)}
-.btn.del{background:transparent;color:#C62828;padding:6px 10px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
-.stat{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left;font:inherit;color:inherit}
-.stat b{display:block;font-size:24px;color:var(--azul)}
-.stat span{font-size:12.5px;color:var(--gris-m)}
-.stat[aria-pressed="true"]{outline:2px solid var(--naranja)}
-.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.campo{border:1.5px solid var(--linea);border-radius:10px;padding:10px 12px;font:500 14px var(--f);color:var(--gris);background:#fff;width:100%}
-.bar .campo{width:auto;flex:1;min-width:200px}
-.list{display:grid;gap:10px}
-.card{background:#fff;border:1px solid var(--linea);border-radius:16px;padding:14px 16px;display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:12px;align-items:center}
-.card h3{margin:0;font-size:16px;color:var(--azul)}
-.card .m{font-size:13px;color:var(--gris-m)}
-.card a{color:var(--naranja-t);font-weight:700;text-decoration:none}
-.est{border-radius:99px;padding:6px 10px;font:700 12.5px var(--f);border:0}
-.notas{grid-column:1/-1;font-size:13.5px;color:var(--gris);background:var(--gris-c);border-radius:10px;padding:8px 10px;white-space:pre-wrap}
+.btn.sec{background:var(--azul);color:#fff}
+.btn.lin{background:#fff;color:var(--azul);border:1px solid var(--linea)}
+.btn.ghost{background:var(--gris-c);color:var(--gris)}
+.hacts{display:flex;gap:8px;flex-wrap:wrap}
+.aviso{background:var(--naranja-c);color:var(--naranja-t);border-radius:12px;padding:10px 12px;font-size:13.5px;display:none;margin:0}
+.bar{display:flex;gap:8px;flex-wrap:wrap}
+.campo{border:1.5px solid var(--linea);border-radius:10px;padding:10px 12px;font:500 14px var(--f);color:var(--gris);background:#fff;width:100%;min-height:42px}
+.bar .campo{flex:1;min-width:200px;width:auto}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chip{border:1px solid var(--linea);background:#fff;border-radius:999px;padding:6px 12px;font-size:.84rem;font-weight:600;white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:36px}
+.chip[aria-pressed="true"]{background:var(--gris);color:var(--bg);border-color:var(--gris)}
+.chip .n{opacity:.7;font-variant-numeric:tabular-nums}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--st,#999);display:inline-block}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:#fff;border:1px solid var(--linea);border-left:5px solid var(--st,#999);border-radius:14px;display:flex;flex-direction:column}
+.card.desc{opacity:.75}
+.card-main{padding:14px 14px 10px;display:flex;flex-direction:column;gap:6px}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.who{font-weight:700;font-size:1.02rem;min-width:0;overflow-wrap:anywhere}
+.pill{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--sbg,#eee);color:var(--st,#333)}
+.meta{color:var(--gris-m);font-size:.84rem;display:flex;flex-wrap:wrap;gap:4px 14px}
+.notas{font-size:.86rem;color:var(--gris-m);white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.tel{display:inline-flex;align-items:center;gap:6px;color:var(--wa);font-weight:700;text-decoration:none;font-variant-numeric:tabular-nums;border-radius:999px;padding:4px 10px;background:var(--wa-c);width:max-content;font-size:.84rem}
+.tel:hover{background:var(--wa);color:#fff}
+.card-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px 8px 14px;border-top:1px solid var(--linea)}
+.cf-msgs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.cf-nav{display:flex;align-items:center;gap:6px;margin-left:auto}
+.wabtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--wa);background:var(--wa-c);color:var(--wa);border-radius:999px;padding:7px 12px;font-weight:700;font-size:.82rem;cursor:pointer;min-height:38px;white-space:nowrap}
+.wabtn svg,.tel svg{width:17px;height:17px}
+.wabtn:hover{background:var(--wa);color:#fff}
+.sent{color:var(--wa);font-weight:600;font-size:.82rem}
+.back{width:36px;height:36px;border-radius:50%;border:1px solid var(--linea);background:#fff;color:var(--gris);cursor:pointer;font-size:1rem;display:inline-grid;place-items:center;padding:0}
+.back:hover{background:var(--gris-c)}
+.adv{border:0;background:var(--naranja);color:#fff;border-radius:999px;padding:9px 14px;font-weight:700;font-size:.84rem;cursor:pointer;white-space:nowrap;min-height:38px}
+.adv:hover{filter:brightness(1.07)}
+.more{position:relative}
+.more>summary{list-style:none;width:36px;height:36px;border-radius:50%;background:var(--gris-c);display:inline-grid;place-items:center;cursor:pointer;font-size:1.2rem;font-weight:700}
+.more>summary::-webkit-details-marker{display:none}
+.menu{position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--linea);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:4px;display:flex;flex-direction:column;min-width:170px;z-index:5}
+.menu button{border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:7px;font-weight:600;font-size:.86rem;cursor:pointer;color:var(--gris)}
+.menu button:hover{background:var(--gris-c)}
+.menu button.bad{color:var(--bad)}
 .vacio{text-align:center;color:var(--gris-m);padding:40px 10px;background:#fff;border:1px dashed var(--linea);border-radius:16px}
+/* Panel de alta/edición */
 .panel{position:fixed;inset:0;background:rgba(15,22,30,.55);display:none;align-items:flex-start;justify-content:center;padding:20px;overflow:auto;z-index:20}
 .panel.on{display:flex}
-.box{background:#fff;color:var(--gris);border-radius:20px;padding:22px;max-width:640px;width:100%}
-:root[data-theme="dark"] .box{background:#18222D}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .box{background:#18222D}}
+.box{background:#fff;border-radius:20px;padding:22px;max-width:640px;width:100%}
 .box h2{margin:0 0 12px;color:var(--azul);font-size:20px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 label{display:grid;gap:4px;font-weight:700;font-size:12.5px;margin-bottom:10px}
 textarea.campo{min-height:80px;resize:vertical}
 .acc{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
-.aviso{background:var(--naranja-c);color:var(--naranja-t);border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:14px;display:none}
-.pegar{background:var(--azul-c);border-radius:12px;padding:12px;margin-bottom:12px}
-.pegar p{margin:0 0 6px;font-size:13px;color:var(--azul);font-weight:700}
-@media (max-width:760px){.card{grid-template-columns:1fr 1fr}.card .acts{grid-column:1/-1;justify-self:start}.g2{grid-template-columns:1fr}}
+.pegar{background:var(--naranja-c);border-radius:12px;padding:12px;margin-bottom:12px}
+.pegar p{margin:0 0 6px;font-size:13px;color:var(--naranja-t);font-weight:700}
+/* Hoja de envío de WhatsApp */
+.velo{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:70}
+.sheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.25);padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));z-index:80;display:flex;flex-direction:column;gap:10px}
+.sh-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sh-h b{font-size:1.02rem}
+.sh-tel{font-size:.84rem;color:var(--gris-m)}
+.sheet textarea{min-height:240px;resize:vertical;font-size:.9rem;line-height:1.45;white-space:pre-wrap}
+.sh-acts{display:flex;gap:8px;flex-wrap:wrap}
+.sh-acts>*{flex:1 1 140px;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.sh-acts .wa{background:var(--wa);color:#fff;border-radius:99px;padding:10px 16px;font-weight:700;font-size:14px}
+.sh-acts .wa:hover{filter:brightness(1.08)}
+.hint{font-size:.8rem;color:var(--gris-m);margin:0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--gris);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.88rem;z-index:90;max-width:90vw;text-align:center}
+@media (max-width:760px){.g2{grid-template-columns:1fr}}
+@media (max-width:520px){.cf-nav .adv{padding:8px 12px;font-size:.8rem}}
 </style>
 
 <header class="top">
   <div><h1>Tracker de afiliaciones</h1><small>Brokers Network · interesados en afiliarse</small></div>
-  <div class="sp"><button class="btn nar" id="nuevo" type="button">+ Agregar interesado</button><button class="btn lin" id="csv" type="button">Descargar CSV</button></div>
+  <div class="hacts"><button class="btn nar" id="nuevo" type="button">+ Agregar interesado</button><button class="btn lin" id="csv" type="button">Descargar CSV</button></div>
 </header>
 
 <main class="wrap">
   <p class="aviso" id="aviso"></p>
-  <div class="stats" id="stats"></div>
+  <nav class="chips" id="chips" aria-label="Filtrar por etapa"></nav>
   <div class="bar"><input class="campo" id="q" type="search" placeholder="Buscar por nombre, celular, ciudad…" aria-label="Buscar"></div>
   <div class="list" id="list"><p class="vacio">Cargando…</p></div>
 </main>
@@ -99,70 +133,189 @@ textarea.campo{min-height:80px;resize:vertical}
       <label>Perfil<input class="campo" name="perfil"></label>
       <label>Experiencia<input class="campo" name="experiencia"></label>
       <label>Nos conoció por<input class="campo" name="fuente"></label>
-      <label>Estado<select class="campo" name="estado" id="fEstado"></select></label>
+      <label>Etapa<select class="campo" name="estado" id="fEstado"></select></label>
       <label>Fecha de entrevista<input class="campo" name="entrevista" type="date"></label>
       <label>Inmobiliaria<input class="campo" name="inmobiliaria"></label>
     </div>
     <label>Notas<textarea class="campo" name="notas"></textarea></label>
-    <div class="acc"><button class="btn sec" type="button" id="cancelar">Cancelar</button><button class="btn nar" type="submit">Guardar</button></div>
+    <div class="acc"><button class="btn lin" type="button" id="cancelar">Cancelar</button><button class="btn nar" type="submit">Guardar</button></div>
   </form>
 </div>
 
+<div class="velo" id="envVelo" hidden></div>
+<section class="sheet" id="envSheet" role="dialog" aria-modal="true" aria-labelledby="envTit" hidden>
+  <div class="sh-h"><b id="envTit">Mensaje</b><button type="button" class="btn ghost" id="envX" aria-label="Cerrar">✕</button></div>
+  <p class="sh-tel" id="envTel"></p>
+  <textarea class="campo" id="envTxt" aria-label="Texto del mensaje"></textarea>
+  <div class="sh-acts">
+    <button type="button" class="btn ghost" id="envRest">Restablecer texto</button>
+    <button type="button" class="btn lin" id="envCopy">Copiar</button>
+    <a class="wa" id="envWa" target="_blank" rel="noopener" href="#">Enviar por WhatsApp</a>
+  </div>
+  <p class="hint">Puedes editar el texto antes de enviarlo. Enviar abre WhatsApp con el mensaje escrito y queda registrado en la tarjeta.</p>
+</section>
+
+<div class="toast" id="toast" hidden></div>
+
 <script>
 (function(){
-  function use(n){return window.claude&&window.claude.use?window.claude.use(n):Promise.resolve(null)}
-  var ESTADOS=[["nuevo","Nuevo","#E7EDF3","#30445A"],["contactado","Contactado","#FFF4E5","#8A4B00"],["entrevista","Entrevista agendada","#EAF0FD","#2A50A8"],["documentos","Documentos","#F3E8FF","#6B2FA0"],["convenio","Convenio / pago","#FFF1EC","#B8401F"],["afiliado","Afiliado","#E8F6EE","#1F6E49"],["descartado","Descartado","#F1F1F1","#777"]];
-  var EST={};ESTADOS.forEach(function(e){EST[e[0]]=e});
-  var rows=[],filtro=null,db=null,col=null,editId=null;
   var $=function(id){return document.getElementById(id)};
+  function use(n){return window.claude&&window.claude.use?window.claude.use(n):Promise.resolve(null)}
+
+  // Etapas en orden del proceso (avanzar/regresar) y color de cada una
+  var ESTADOS=[["nuevo","Nuevo","#E7EDF3","#30445A"],["contactado","Contactado","#FFF4E5","#8A4B00"],["entrevista","Entrevista agendada","#EAF0FD","#2A50A8"],["documentos","Documentos","#F3E8FF","#6B2FA0"],["convenio","Convenio / pago","#FFF1EC","#B8401F"],["afiliado","Afiliado","#E8F6EE","#1F6E49"],["descartado","Descartado","#F1F1F1","#777"]];
+  var FLUJO=["nuevo","contactado","entrevista","documentos","convenio","afiliado"];
+  var EST={};ESTADOS.forEach(function(e){EST[e[0]]=e});
+  function label(k){return (EST[k]||EST.nuevo)[1]}
+  function etapa(r){return r.estado&&EST[r.estado]?r.estado:"nuevo"}
+  function anterior(k){var i=FLUJO.indexOf(k);return i>0?FLUJO[i-1]:null}
+  function siguiente(k){var i=FLUJO.indexOf(k);return i>=0&&i<FLUJO.length-1?FLUJO[i+1]:null}
+  var CAMPOS=['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas'];
+
+  var WA_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.9 2.9 4.6 4 1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3Z"/></svg>';
+
+  // Textos de WhatsApp por etapa. Son solo punto de partida: se pueden editar en la hoja antes de enviar.
+  var PROCESO=["🏡 Proceso de afiliación a Brokers Network","","1. 📝 Registro","Completa nuestro formulario de registro para compartirnos tu información y conocer tu perfil profesional.","🔗 https://www.brokersnetwork.mx/registro.html","","2. 🤝 Entrevista","Agendaremos una entrevista para conocerte, explicarte nuestro modelo de colaboración, presentarte los beneficios y condiciones de afiliación, y resolver todas tus dudas.","","3. 📄 Convenio de afiliación","Te compartiremos nuestro convenio para que lo revises con calma. Podrás dejar tus dudas o comentarios directamente en el documento para aclararlos antes de formalizar tu incorporación.","🔗 https://docs.google.com/document/d/1iLJAYRG-JWfumM5pAalN3b-Rc-952Vdx/edit?usp=sharing","","4. 💳 Activación de tu membresía","Si tu entrevista resulta favorable, te enviaremos la liga de pago para que elijas y actives tu membresía. Una vez confirmado el pago, continuaremos con tu incorporación a Brokers Network y te compartiremos los accesos y recursos correspondientes.","","¡Estamos listos para crecer contigo! 🏡✨"].join("\n");
+  var BIENVENIDA=["¡Bienvenida a Brokers Network! Estamos felices de crecer contigo. 🏡🤝✨","","🤝 ACCESOS A LA COMUNIDAD BROKERS NETWORK","Te compartimos los grupos de WhatsApp y recursos de trabajo para integrarte a nuestra comunidad. 🏡","📲 Grupos de WhatsApp","📢 BN Oficial","https://chat.whatsapp.com/L0rTvnGFrB1GF8Uu5zBesx","🤝 Team BN","https://chat.whatsapp.com/1Snwlsf4AAhDL8FUz6uaps","📍 BN Sur","https://chat.whatsapp.com/HE0xSCwqWF8HTEivnbxCLL","🌎 BN Foráneos","https://chat.whatsapp.com/CbRuKoeuM0a1rzaY9KK6t5","📣 Estrategia de medios","https://chat.whatsapp.com/KrpKDQXzvuoIpqSBrmpTdB","🎓 Capacitaciones","https://chat.whatsapp.com/LFp0RUPvgIJJ5qg8gKQcwV","","📁 Drive de Brokers Network","Aquí encontrarás más de 60 formatos y documentos de apoyo para tu operación inmobiliaria:","https://drive.google.com/drive/folders/1CiAnmjbzBMe_0hbWo2f1hC8kyv7M6sQm","","🎨 Material personalizado","También te compartiremos tus materiales personalizados para WhatsApp y redes sociales, tarjetas de presentación y promoción de propiedades, según corresponda.","","📲 Acceso a BrokTool","🌐 Plataforma web:","https://brokersnetwork.broktool.com/es","🍎 App Store:","https://apps.apple.com/mx/app/broktool-network-inmobiliaria/id6746459085","🤖 Google Play:","https://play.google.com/store/apps/details?id=com.broktool.app","","👀 Importante: Estamos trabajando en la mejora continua de nuestra plataforma web para ofrecerte una mejor experiencia. 🙌 Te pedimos un poquito de paciencia mientras seguimos haciendo ajustes. Próximamente te compartiremos cómo reportar cualquier detalle a nuestro equipo de soporte para darle seguimiento."].join("\n");
+  var LIGA_CONVENIO="https://docs.google.com/document/d/1iLJAYRG-JWfumM5pAalN3b-Rc-952Vdx/edit?usp=sharing";
+  function saludo(r){var p=String(r.nombre||"").trim().split(/\s+/)[0];return "Hola"+(p?" "+p:"")+"! "}
+  var PLANT={
+    nuevo:function(r){return saludo(r)+"👋\n\n"+PROCESO},
+    contactado:function(r){return saludo(r)+"👋 Gracias por tu interés en Brokers Network. ¿Te parece si agendamos tu entrevista? Nos encantaría conocerte, explicarte nuestro modelo de colaboración y resolver tus dudas. ¿Qué día y horario te acomoda mejor? 🗓️"},
+    entrevista:function(r){return saludo(r)+"🤝 Te compartimos nuestro convenio de afiliación para que lo revises con calma. Puedes dejar tus dudas o comentarios directamente en el documento:\n🔗 "+LIGA_CONVENIO},
+    documentos:function(r){return saludo(r)+"👋 ¿Tienes alguna duda o comentario sobre el convenio? Puedes dejarlo directamente en el documento para aclararlo antes de formalizar tu incorporación:\n🔗 "+LIGA_CONVENIO},
+    convenio:function(r){return saludo(r)+"🎉 Te compartimos la liga de pago para elegir y activar tu membresía:\n🔗 [pega aquí la liga de pago]\n\nUna vez confirmado el pago, continuaremos con tu incorporación a Brokers Network y te compartiremos los accesos y recursos correspondientes."},
+    afiliado:function(r){return BIENVENIDA}
+  };
+  function plantilla(r){var f=PLANT[etapa(r)];return f?f(r):""}
+
+  var rows=[],filtro="activos",db=null,col=null,editId=null,envioId=null;
   var form=$('form'),panel=$('panel');
-  ESTADOS.forEach(function(e){var o=document.createElement('option');o.value=e[0];o.textContent=e[1];$('fEstado').appendChild(o)});
+  FLUJO.concat(["descartado"]).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=label(k);$('fEstado').appendChild(o)});
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function digits(t){var d=String(t||"").replace(/\D/g,"");if(d.length===10)d="52"+d;return d}
+  function waHref(cel,texto){var n=digits(cel);return "https://api.whatsapp.com/send?"+(n?"phone="+n+"&":"")+"text="+encodeURIComponent(String(texto||"").normalize("NFC"))}
   function aviso(t){var a=$('aviso');a.textContent=t||'';a.style.display=t?'block':'none'}
-  function el(tag,attrs,text){var e=document.createElement(tag);for(var k in attrs||{})e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e}
-  function render(){
-    var st=$('stats');st.innerHTML='';
-    var tot=el('button',{class:'stat',type:'button','aria-pressed':String(filtro===null)});tot.appendChild(el('b',{},rows.length));tot.appendChild(el('span',{},'Todos'));tot.onclick=function(){filtro=null;render()};st.appendChild(tot);
-    ESTADOS.forEach(function(e){var n=rows.filter(function(r){return (r.estado||'nuevo')===e[0]}).length;var b=el('button',{class:'stat',type:'button','aria-pressed':String(filtro===e[0])});var bb=el('b',{},n);bb.style.color=e[3];b.appendChild(bb);b.appendChild(el('span',{},e[1]));b.onclick=function(){filtro=filtro===e[0]?null:e[0];render()};st.appendChild(b)});
-    var q=$('q').value.trim().toLowerCase();
-    var vis=rows.filter(function(r){return (!filtro||(r.estado||'nuevo')===filtro)&&(!q||[r.nombre,r.cel,r.ciudad,r.correo,r.fuente].join(' ').toLowerCase().indexOf(q)>=0)});
-    var L=$('list');L.innerHTML='';
-    if(!vis.length){L.appendChild(el('p',{class:'vacio'},rows.length?'Ningún interesado con ese filtro.':'Aún no hay interesados. Agrega el primero con “+ Agregar interesado” o pega el mensaje de WhatsApp que llega desde el sitio.'));return}
-    vis.forEach(function(r){
-      var c=el('article',{class:'card'});
-      var a=el('div');a.appendChild(el('h3',{},r.nombre||'(sin nombre)'));a.appendChild(el('div',{class:'m'},[r.ciudad,r.perfil].filter(Boolean).join(' · ')||'—'));c.appendChild(a);
-      var b=el('div',{class:'m'});
-      if(r.cel){var w=el('a',{href:'https://api.whatsapp.com/send?phone=52'+String(r.cel).replace(/\D/g,'').slice(-10),target:'_blank',rel:'noopener'},'WhatsApp '+r.cel);b.appendChild(w);b.appendChild(el('br'))}
-      if(r.correo)b.appendChild(document.createTextNode(r.correo));c.appendChild(b);
-      var s=el('select',{class:'est','aria-label':'Estado de '+(r.nombre||'')});ESTADOS.forEach(function(e){var o=el('option',{value:e[0]},e[1]);if((r.estado||'nuevo')===e[0])o.selected=true;s.appendChild(o)});
-      var e=EST[r.estado||'nuevo'];s.style.background=e[2];s.style.color=e[3];
-      s.onchange=function(){guardar(r.id,{estado:s.value})};
-      var sw=el('div');sw.appendChild(s);if(r.entrevista)sw.appendChild(el('div',{class:'m'},'Entrevista: '+r.entrevista));c.appendChild(sw);
-      var acts=el('div',{class:'acts'});var ed=el('button',{class:'btn sec',type:'button'},'Editar');ed.onclick=function(){abrir(r)};var dl=el('button',{class:'btn del',type:'button'},'Eliminar');dl.onclick=function(){if(confirm('¿Eliminar a '+(r.nombre||'este interesado')+'?'))col.doc(r.id).delete().catch(function(){aviso('No se pudo eliminar.')})};acts.appendChild(ed);acts.appendChild(dl);c.appendChild(acts);
-      if(r.notas)c.appendChild(el('div',{class:'notas'},r.notas));
-      L.appendChild(c);
-    });
+  var tt=null;function toast(t){var el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(tt);tt=setTimeout(function(){el.hidden=true},2200)}
+
+  function visible(r){
+    var e=etapa(r);
+    if(filtro==="activos")return e!=="descartado";
+    return e===filtro;
   }
+  function renderChips(){
+    var c=$('chips');
+    var opts=[["activos","Activos",rows.filter(function(r){return etapa(r)!=="descartado"}).length,"#30445A"]]
+      .concat(FLUJO.map(function(k){return [k,label(k),rows.filter(function(r){return etapa(r)===k}).length,EST[k][3]]}))
+      .concat([["descartado","Descartados",rows.filter(function(r){return etapa(r)==="descartado"}).length,EST.descartado[3]]]);
+    c.innerHTML=opts.map(function(o){return '<button type="button" class="chip" style="--st:'+o[3]+'" data-f="'+o[0]+'" aria-pressed="'+(filtro===o[0])+'">'+(o[0]==="activos"?"":'<i aria-hidden="true"></i>')+esc(o[1])+' <span class="n">'+o[2]+'</span></button>'}).join("");
+  }
+  function cardHTML(r){
+    var e=etapa(r),st=EST[e],sig=siguiente(e),ant=anterior(e),env=(r.envios||[]).length;
+    var desc=e==="descartado";
+    var meta=[r.ciudad,r.perfil].filter(Boolean).map(esc).join(" · ");
+    return '<article class="card'+(desc?' desc':'')+'" data-id="'+esc(r.id)+'" style="--st:'+st[3]+';--sbg:'+st[2]+'">'
+      +'<div class="card-main">'
+      +'<div class="card-top"><span class="who">'+esc(r.nombre||"(sin nombre)")+'</span><span class="pill">'+esc(label(e))+'</span></div>'
+      +'<div class="meta">'+(meta?'<span>'+meta+'</span>':'')+(r.fuente?'<span>Nos conoció por: '+esc(r.fuente)+'</span>':'')+(r.entrevista?'<span>📅 Entrevista: '+esc(r.entrevista)+'</span>':'')+(r.inmobiliaria?'<span>🏢 '+esc(r.inmobiliaria)+'</span>':'')+'</div>'
+      +(r.cel?'<a class="tel" target="_blank" rel="noopener" href="'+waHref(r.cel,"")+'">'+WA_SVG+'<span>'+esc(r.cel)+'</span></a>':'')
+      +(r.correo?'<div class="meta"><span>✉️ '+esc(r.correo)+'</span></div>':'')
+      +(r.notas?'<p class="notas">'+esc(r.notas)+'</p>':'')
+      +'</div>'
+      +'<div class="card-foot"><div class="cf-msgs">'
+      +(desc?'':'<button type="button" class="wabtn" data-act="enviar" title="Enviar mensaje de '+esc(st[1])+' por WhatsApp">'+WA_SVG+'<span>Enviar mensaje</span></button>')
+      +(env?'<span class="sent">✓ Enviado '+env+'×</span>':'')
+      +'</div><div class="cf-nav">'
+      +(desc?'':(ant?'<button type="button" class="back" data-act="regresar" title="Regresar a '+esc(label(ant))+'" aria-label="Regresar a '+esc(label(ant))+'">←</button>':''))
+      +(desc?'':(sig?'<button type="button" class="adv" data-act="avanzar" title="Avanzar a '+esc(label(sig))+'">Avanzar a '+esc(label(sig))+' →</button>':''))
+      +(desc?'<button type="button" class="adv" data-act="reactivar">Reactivar</button>':'')
+      +'<details class="more"><summary aria-label="Más opciones" title="Más opciones">⋯</summary><div class="menu">'
+      +'<button type="button" data-act="editar">Editar</button>'
+      +(desc?'':'<button type="button" class="bad" data-act="descartar">Descartar</button>')
+      +'<button type="button" class="bad" data-act="eliminar">Eliminar</button>'
+      +'</div></details>'
+      +'</div></div></article>';
+  }
+  function render(){
+    renderChips();
+    var q=$('q').value.trim().toLowerCase();
+    var vis=rows.filter(function(r){return visible(r)&&(!q||[r.nombre,r.cel,r.ciudad,r.correo,r.fuente].join(" ").toLowerCase().indexOf(q)>=0)});
+    var L=$('list');
+    if(!vis.length){L.innerHTML='<p class="vacio">'+(rows.length?'Ningún interesado con ese filtro.':'Aún no hay interesados. Agrega el primero con “+ Agregar interesado” o pega el mensaje de WhatsApp que llega desde el sitio.')+'</p>';return}
+    L.innerHTML=vis.map(cardHTML).join("");
+  }
+
   function abrir(r){editId=r?r.id:null;form.reset();$('pegarBox').style.display=r?'none':'block';$('pt').textContent=r?'Editar interesado':'Nuevo interesado';
-    ['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas'].forEach(function(k){if(form[k])form[k].value=r&&r[k]!=null?r[k]:(k==='estado'?'nuevo':'')});
+    CAMPOS.forEach(function(k){if(form[k])form[k].value=r&&r[k]!=null?r[k]:(k==='estado'?'nuevo':'')});
     panel.classList.add('on');form.nombre.focus()}
   function cerrar(){panel.classList.remove('on')}
   $('nuevo').onclick=function(){if(!col){aviso('Sin conexión con la hoja de Google. Recarga la página.');return}abrir(null)};
   $('cancelar').onclick=cerrar;panel.onclick=function(e){if(e.target===panel)cerrar()};
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')cerrar()});
   $('q').oninput=render;
   $('pegar').oninput=function(){var t=this.value,map={'Nombre':'nombre','Correo':'correo','Celular':'cel','Ciudad':'ciudad','Inmobiliaria':'inmobiliaria','Perfil':'perfil','Experiencia':'experiencia','Nos conoció por':'fuente'};
     t.split(/\n/).forEach(function(l){var m=l.match(/^\s*[•\-*]?\s*([^:]+):\s*(.+)$/);if(m&&map[m[1].trim()])form[map[m[1].trim()]].value=m[2].trim()});
     var i=t.match(/Le interesa:\s*(.+)/);if(i&&!form.notas.value)form.notas.value='Le interesa: '+i[1].trim()};
-  function guardar(id,data){if(!col)return Promise.reject();return col.doc(id).update(data).catch(function(){aviso('No se pudo guardar el cambio.')})}
-  form.onsubmit=function(e){e.preventDefault();var d={};['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas'].forEach(function(k){d[k]=(form[k].value||'').trim()});
+  form.onsubmit=function(e){e.preventDefault();var d={};CAMPOS.forEach(function(k){d[k]=(form[k].value||'').trim()});
     if(!d.nombre){form.nombre.focus();return}
+    if(!d.estado)d.estado="nuevo";
     var p=editId?col.doc(editId).update(d):col.doc().set(Object.assign(d,{creado:new Date().toISOString()}));
     p.then(function(){cerrar();aviso('')},function(err){aviso(err&&err.code==='quota_exceeded'?'Se llenó el espacio del tracker; elimina registros viejos.':'No se pudo guardar. Revisa tu conexión e intenta de nuevo.')})};
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){cerrar();cerrarEnvio()}});
+
+  // Cambio de etapa (avanzar, regresar, descartar, reactivar)
+  function cambiar(r,estado,msg){
+    if(!col||!estado)return;
+    col.doc(r.id).update({estado:estado}).then(function(){toast(r.nombre+" → "+label(estado))},function(err){toast("No se pudo guardar: "+((err&&err.message)||(err&&err.code)||""))});
+  }
+
+  // Hoja de envío de WhatsApp con texto editable
+  var envioR=null;
+  function abrirEnvio(r){
+    envioR=r;envioId=r.id;
+    $('envTit').textContent='Mensaje · '+label(etapa(r));
+    $('envTel').textContent=r.cel?'Para: '+(r.nombre||'')+' · '+r.cel:'Sin celular registrado: WhatsApp pedirá el contacto.';
+    $('envTxt').value=plantilla(r);
+    $('envWa').href=waHref(r.cel,$('envTxt').value);
+    $('envSheet').hidden=false;$('envVelo').hidden=false;$('envTxt').focus();
+  }
+  function cerrarEnvio(){$('envSheet').hidden=true;$('envVelo').hidden=true;envioId=null;envioR=null}
+  $('envX').onclick=cerrarEnvio;$('envVelo').onclick=cerrarEnvio;
+  $('envTxt').oninput=function(){$('envWa').href=waHref(envioR&&envioR.cel,this.value)};
+  $('envRest').onclick=function(){if(!envioR)return;$('envTxt').value=plantilla(envioR);$('envWa').href=waHref(envioR.cel,$('envTxt').value)};
+  $('envCopy').onclick=function(){var t=$('envTxt');var txt=t.value;
+    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){toast("Mensaje copiado")},function(){t.select();toast("Texto seleccionado: cópialo manualmente")})};
+  $('envWa').onclick=function(){
+    var r=envioR;cerrarEnvio();
+    if(r&&col){
+      var envios=(r.envios||[]).concat([{etapa:etapa(r),fecha:new Date().toISOString()}]);
+      col.doc(r.id).update({envios:envios}).catch(function(){});
+    }
+  };
+
+  // Acciones de cada tarjeta
+  $('list').addEventListener('click',function(e){
+    var b=e.target.closest('[data-act]');if(!b)return;
+    var c=b.closest('.card');var r=c&&rows.find(function(x){return x.id===c.dataset.id});if(!r)return;
+    var act=b.dataset.act;
+    var d=b.closest('details');if(d)d.open=false;
+    if(act==='enviar'){abrirEnvio(r);return}
+    if(act==='avanzar'){cambiar(r,siguiente(etapa(r)));return}
+    if(act==='regresar'){cambiar(r,anterior(etapa(r)));return}
+    if(act==='reactivar'){cambiar(r,"nuevo");return}
+    if(act==='descartar'){if(confirm('¿Descartar a '+(r.nombre||'este interesado')+'?'))cambiar(r,"descartado");return}
+    if(act==='editar'){abrir(r);return}
+    if(act==='eliminar'){if(col&&confirm('¿Eliminar a '+(r.nombre||'este interesado')+'?'))col.doc(r.id).delete().catch(function(){aviso('No se pudo eliminar.')});return}
+  });
+
   $('csv').onclick=function(){var cols=['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','creado'];
-    var csv=[cols.join(',')].concat(rows.map(function(r){return cols.map(function(k){var v=k==='estado'?(EST[r.estado||'nuevo']||[0,r.estado])[1]:(r[k]||'');return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')})).join('\n');
-    var blob=new Blob(['﻿'+csv],{type:'text/csv'});use('downloads').then(function(dl){if(dl)return dl.save({filename:'afiliaciones-bn.csv',data:blob});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='afiliaciones-bn.csv';a.click()}).catch(function(){})};
+    var csv=[cols.join(',')].concat(rows.map(function(r){return cols.map(function(k){var v=k==='estado'?label(etapa(r)):(r[k]||'');return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')})).join('\n');
+    var blob=new Blob(['\ufeff'+csv],{type:'text/csv'});use('downloads').then(function(dl){if(dl)return dl.save({filename:'afiliaciones-bn.csv',data:blob});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='afiliaciones-bn.csv';a.click()}).catch(function(){})};
+
+  $('chips').addEventListener('click',function(e){var b=e.target.closest('[data-f]');if(!b)return;filtro=b.dataset.f;render()});
+
   use('db').then(function(d){
-    if(!d){$('list').innerHTML='';$('list').appendChild(el('p',{class:'vacio'},'Inicia sesión en el panel admin para ver el tracker.'));return}
+    if(!d){$('list').innerHTML='<p class="vacio">Inicia sesión en el panel admin para ver el tracker.</p>';renderChips();return}
     db=d;col=db.collection('prospectos');
     col.orderBy('creado','desc').onSnapshot(function(s){rows=s.docs.map(function(x){var o=Object.assign({},x.data());o.id=x.id;return o});render()},function(){aviso('Se perdió la conexión con el tracker. Recarga la página.')});
   });
