@@ -96,6 +96,9 @@ textarea.campo{min-height:80px;resize:vertical}
 .sh-h b{font-size:1.02rem}
 .sh-tel{font-size:.84rem;color:var(--gris-m)}
 .sheet textarea{min-height:240px;resize:vertical;font-size:.9rem;line-height:1.45;white-space:pre-wrap}
+.sh-sel{display:flex;gap:6px;flex-wrap:wrap}
+.sh-sel button{border:1px solid var(--linea);background:#fff;border-radius:999px;padding:7px 12px;font-weight:700;font-size:.82rem;cursor:pointer}
+.sh-sel button[aria-pressed="true"]{background:var(--gris);color:var(--bg);border-color:var(--gris)}
 .sh-acts{display:flex;gap:8px;flex-wrap:wrap}
 .sh-acts>*{flex:1 1 140px;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .sh-acts .wa{background:var(--wa);color:#fff;border-radius:99px;padding:10px 16px;font-weight:700;font-size:14px}
@@ -148,6 +151,7 @@ textarea.campo{min-height:80px;resize:vertical}
 <section class="sheet" id="envSheet" role="dialog" aria-modal="true" aria-labelledby="envTit" hidden>
   <div class="sh-h"><b id="envTit">Mensaje</b><button type="button" class="btn ghost" id="envX" aria-label="Cerrar">✕</button></div>
   <p class="sh-tel" id="envTel"></p>
+  <div class="sh-sel" id="envSel" hidden></div>
   <textarea class="campo" id="envTxt" aria-label="Texto del mensaje"></textarea>
   <div class="sh-acts">
     <button type="button" class="btn ghost" id="envRest">Restablecer texto</button>
@@ -196,7 +200,15 @@ textarea.campo{min-height:80px;resize:vertical}
     convenio:function(r){return saludo(r)+"🎉 Te compartimos la liga de pago para elegir y activar tu membresía:\n🔗 [pega aquí la liga de pago]\n\nUna vez confirmado el pago, continuaremos con tu incorporación a Brokers Network y te compartiremos los accesos y recursos correspondientes."},
     afiliado:function(r){return bienvenida(r)}
   };
-  function plantilla(r){var f=PLANT[etapa(r)];return f?f(r):""}
+  // Segundo mensaje de la etapa Afiliado: revisión de materiales y proveedores de impresión
+  var MATERIALES=["REVISIÓN DE MATERIALES","","A continuación ponemos a tu disposición el diseño de tu perfil, lonas y tarjetas para tu revisión. Verifica con cuidado tus datos.","","Sugerimos agregar el logo a tu perfil de Whatsapp / Facebook para atraer clientes e interés de parte de tus familiares y conocidos.","","Todos los materiales están listos para impresión sin que sea necesaria revisión por parte de impresores.","","Te sugerimos los siguientes proveedores para impresión de tus materiales (comenta que eres parte de BN):","","LONAS Especificaciones sugeridas: Lona de 1x1.1m con dobladillo y ojillos","","1️⃣ Central Graphics","Enrique Vitte","Cel. 55 7812 6476","Costo $100 más envío","","2️⃣ Pop Creativo","Contacto: Bibiana Ortega","Cel. 55 2085 8938","Costo $100 más envío","","TARJETAS DE PRESENTACIÓN","","1️⃣ Central Graphics","Enrique Vitte","Cel. 55 7812 6476","Costo $350 más envío","","2️⃣ www.imprimir360.com.mx"].join("\n");
+  var SEGUNDOS={afiliado:[["bienvenida","Bienvenida",function(r){return bienvenida(r)}],["materiales","Revisión de materiales",function(r){return MATERIALES}]]};
+  function opcionesEnvio(r){return SEGUNDOS[etapa(r)]||null}
+  function plantilla(r,k){
+    var ops=opcionesEnvio(r);
+    if(ops){var o=ops.filter(function(x){return x[0]===(k||ops[0][0])})[0]||ops[0];return o[2](r)}
+    var f=PLANT[etapa(r)];return f?f(r):"";
+  }
 
   var rows=[],filtro="activos",db=null,col=null,editId=null,envioId=null;
   var form=$('form'),panel=$('panel');
@@ -279,12 +291,18 @@ textarea.campo{min-height:80px;resize:vertical}
   }
 
   // Hoja de envío de WhatsApp con texto editable
-  var envioR=null;
+  var envioR=null,envioK=null;
+  function pintarSel(){
+    var box=$('envSel');var ops=envioR&&opcionesEnvio(envioR);
+    box.hidden=!ops;box.innerHTML=ops?ops.map(function(o){return '<button type="button" data-k="'+o[0]+'" aria-pressed="'+(o[0]===envioK)+'">'+esc(o[1])+'</button>'}).join(""):"";
+  }
+  function refrescarEnvio(){$('envTxt').value=plantilla(envioR,envioK);$('envWa').href=waHref(envioR.cel,$('envTxt').value);pintarSel()}
+  $('envSel').onclick=function(e){var b=e.target.closest('[data-k]');if(!b||!envioR)return;envioK=b.dataset.k;refrescarEnvio()};
   function abrirEnvio(r){
-    envioR=r;envioId=r.id;
+    envioR=r;envioId=r.id;envioK=(opcionesEnvio(r)||[[null]])[0][0];
     $('envTit').textContent='Mensaje · '+label(etapa(r));
     $('envTel').textContent=r.cel?'Para: '+(r.nombre||'')+' · '+r.cel:'Sin celular registrado: WhatsApp pedirá el contacto.';
-    $('envTxt').value=plantilla(r);
+    pintarSel();$('envTxt').value=plantilla(r,envioK);
     if(etapa(r)==='afiliado'&&!r.correoBN)$('envTel').textContent+=' · ⚠️ Falta el correo institucional';
     $('envWa').href=waHref(r.cel,$('envTxt').value);
     $('envSheet').hidden=false;$('envVelo').hidden=false;$('envTxt').focus();
@@ -292,13 +310,13 @@ textarea.campo{min-height:80px;resize:vertical}
   function cerrarEnvio(){$('envSheet').hidden=true;$('envVelo').hidden=true;envioId=null;envioR=null}
   $('envX').onclick=cerrarEnvio;$('envVelo').onclick=cerrarEnvio;
   $('envTxt').oninput=function(){$('envWa').href=waHref(envioR&&envioR.cel,this.value)};
-  $('envRest').onclick=function(){if(!envioR)return;$('envTxt').value=plantilla(envioR);$('envWa').href=waHref(envioR.cel,$('envTxt').value)};
+  $('envRest').onclick=function(){if(!envioR)return;refrescarEnvio()};
   $('envCopy').onclick=function(){var t=$('envTxt');var txt=t.value;
     (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){toast("Mensaje copiado")},function(){t.select();toast("Texto seleccionado: cópialo manualmente")})};
   $('envWa').onclick=function(){
     var r=envioR;cerrarEnvio();
     if(r&&col){
-      var envios=(r.envios||[]).concat([{etapa:etapa(r),fecha:new Date().toISOString()}]);
+      var envios=(r.envios||[]).concat([Object.assign({etapa:etapa(r),fecha:new Date().toISOString()},envioK?{mensaje:envioK}:{})]);
       col.doc(r.id).update({envios:envios}).catch(function(){});
     }
   };
