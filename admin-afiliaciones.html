@@ -108,7 +108,7 @@ textarea.campo{min-height:80px;resize:vertical}
 
 <header class="top">
   <div><h1>Tracker de afiliaciones</h1><small>Brokers Network · interesados en afiliarse</small></div>
-  <div class="hacts"><button class="btn nar" id="nuevo" type="button">+ Agregar interesado</button><button class="btn lin" id="csv" type="button">Descargar CSV</button></div>
+  <div class="hacts"><button class="btn nar" id="nuevo" type="button">+ Agregar interesado</button><button class="btn lin" id="imp" type="button">Importar Excel</button><button class="btn lin" id="csv" type="button">Descargar CSV</button><input type="file" id="impFile" accept=".xlsx,.xls,.csv" hidden></div>
 </header>
 
 <main class="wrap">
@@ -319,6 +319,52 @@ textarea.campo{min-height:80px;resize:vertical}
   $('csv').onclick=function(){var cols=['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','creado'];
     var csv=[cols.join(',')].concat(rows.map(function(r){return cols.map(function(k){var v=k==='estado'?label(etapa(r)):(r[k]||'');return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')})).join('\n');
     var blob=new Blob(['\ufeff'+csv],{type:'text/csv'});use('downloads').then(function(dl){if(dl)return dl.save({filename:'afiliaciones-bn.csv',data:blob});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='afiliaciones-bn.csv';a.click()}).catch(function(){})};
+
+  // Importar desde Excel/CSV. La librería de lectura se carga solo al usar el botón.
+  var XLSX_URL="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+  function cargarXLSX(){
+    if(window.XLSX)return Promise.resolve(window.XLSX);
+    return new Promise(function(ok,fail){var sc=document.createElement('script');sc.src=XLSX_URL;sc.onload=function(){window.XLSX?ok(window.XLSX):fail(new Error('sin XLSX'))};sc.onerror=function(){fail(new Error('red'))};document.head.appendChild(sc)});
+  }
+  function norm(t){return String(t||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/\s+/g," ").trim()}
+  var MAPA_COL={"nombre":"nombre","celular":"cel","cel":"cel","telefono":"cel","correo":"correo","correo personal":"correo","correo institucional bn":"correoBN","correo institucional":"correoBN","ciudad":"ciudad","perfil":"perfil","experiencia":"experiencia","nos conocio por":"fuente","fuente":"fuente","etapa":"estado","estado":"estado","fecha de entrevista":"entrevista","entrevista":"entrevista","inmobiliaria":"inmobiliaria","notas":"notas"};
+  function etapaDe(t){var n=norm(t);if(!n)return "nuevo";for(var i=0;i<ESTADOS.length;i++){if(norm(ESTADOS[i][0])===n||norm(ESTADOS[i][1])===n)return ESTADOS[i][0]}return "nuevo"}
+  function fechaDe(v){if(v==null||v==="")return "";if(v instanceof Date)return v.toISOString().slice(0,10);return String(v).trim()}
+  function leerFilas(file){
+    return cargarXLSX().then(function(X){return file.arrayBuffer().then(function(buf){
+      var wb=X.read(new Uint8Array(buf),{type:"array",cellDates:true});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      return X.utils.sheet_to_json(ws,{defval:"",raw:false});
+    })});
+  }
+  function importar(file){
+    if(!col){aviso("Sin conexión con la hoja de Google. Recarga la página.");return}
+    leerFilas(file).then(function(filas){
+      var nuevos=[],omitidos=0,sinNombre=0;
+      var existentes=rows.map(function(r){return {n:norm(r.nombre),c:String(r.cel||"").replace(/\D/g,"").slice(-10)}});
+      filas.forEach(function(f){
+        var d={};CAMPOS.forEach(function(k){d[k]=""});
+        Object.keys(f).forEach(function(h){var k=MAPA_COL[norm(h)];if(k)d[k]=String(f[h]==null?"":f[h]).trim()});
+        d.entrevista=fechaDe(d.entrevista);
+        d.estado=etapaDe(d.estado);
+        if(!d.nombre){sinNombre++;return}
+        var c=d.cel.replace(/\D/g,"").slice(-10),n=norm(d.nombre);
+        if(existentes.some(function(e){return e.n===n||(c&&e.c===c)})||nuevos.some(function(x){return norm(x.nombre)===n})){omitidos++;return}
+        nuevos.push(d);
+      });
+      if(!nuevos.length){aviso("No hay registros nuevos para importar"+(omitidos?" ("+omitidos+" ya existen)":"")+(sinNombre?"; "+sinNombre+" sin nombre":"")+".");return}
+      var msg="Se importarán "+nuevos.length+" interesado"+(nuevos.length===1?"":"s")+".\n"+(omitidos?omitidos+" ya existen y se omiten.\n":"")+(sinNombre?sinNombre+" sin nombre se omiten.\n":"")+"\n¿Continuar?";
+      if(!confirm(msg))return;
+      var base=Date.now();
+      return Promise.all(nuevos.map(function(d,i){return col.doc().set(Object.assign(d,{creado:new Date(base+i).toISOString()})).then(function(){return 1},function(){return 0})})).then(function(res){
+        var ok=res.reduce(function(a,b){return a+b},0);
+        toast(ok+" interesado"+(ok===1?"":"s")+" importado"+(ok===1?"":"s"));
+        if(ok<nuevos.length)aviso((nuevos.length-ok)+" no se pudieron guardar. Revisa tu conexión e intenta de nuevo.");
+      });
+    }).catch(function(err){aviso("No pude leer el archivo. Usa un Excel (.xlsx) o CSV con las columnas de la plantilla."+(err&&err.message==="red"?" (No se cargó la librería de Excel; revisa tu conexión.)":""))});
+  }
+  $('imp').onclick=function(){$('impFile').click()};
+  $('impFile').onchange=function(){var f=this.files&&this.files[0];this.value="";if(f)importar(f)};
 
   $('chips').addEventListener('click',function(e){var b=e.target.closest('[data-f]');if(!b)return;filtro=b.dataset.f;render()});
 
