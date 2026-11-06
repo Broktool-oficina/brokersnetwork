@@ -240,6 +240,10 @@ div.doc span{flex:1}
 .cb-h h3{color:#fff;font-size:clamp(22px,2.8vw,30px);margin:2px 0}
 .cb-h p:last-child{margin:0;color:#C9D4E0;font-size:15px}
 .calc-band .calc2{margin-top:0;border:0;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sg button{border:1.5px solid var(--linea);background:#fff;border-radius:12px;padding:12px;font:700 14px var(--f);cursor:pointer;color:var(--gris)}
+.sg button[aria-pressed=true]{background:var(--naranja);border-color:var(--naranja);color:#fff}
+.pa-nota{font-size:12.5px;color:#C9D4E0;margin:0}
 @media (max-width:520px){.calc-band{padding:16px;border-radius:20px}.cb-ic{width:46px;height:46px;font-size:22px}}
 /* cómo trabajamos: cifras y lo que nos rige */
 #como .cifras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;background:var(--azul);color:#fff;margin-top:26px}
@@ -396,6 +400,30 @@ div.doc span{flex:1}
       </div>
       <p class="nota-ref">Cálculo ilustrativo y aproximado; no constituye una oferta. El monto final depende de la operación y del acuerdo firmado.</p>
 
+      <div class="calc-band" id="calculadora-panama" style="margin-top:28px">
+        <div class="cb-h"><span class="cb-ic" aria-hidden="true">🧮</span><div><p class="cb-k">Herramienta · Panamá</p><h3>¿Cuánto ganarías por referir a Panamá?</h3><p>Comisión del 5%. Elige cómo llega el cliente y cuánto cedemos a nuestros asesores.</p></div></div>
+        <div class="calc2">
+          <div class="cin">
+            <h3>Datos de la operación</h3>
+            <p class="lbl2">¿Cómo llega el cliente?</p>
+            <div class="sg" role="group" aria-label="Supuesto"><button type="button" data-sup="directo" aria-pressed="true">Cliente directo</button><button type="button" data-sup="comprador" aria-pressed="false">Con asesor del comprador</button></div>
+            <label>Precio de la propiedad (USD)
+              <input id="p-precio" class="campo2" type="text" inputmode="numeric" value="500,000"></label>
+            <label id="p-ces-wrap" hidden>Porcentaje de nuestra parte que cedemos a nuestros asesores
+              <input id="p-ces" class="campo2" type="text" inputmode="numeric" value="50"></label>
+            <p class="pa-nota" id="p-supnota"></p>
+          </div>
+          <div class="cout">
+            <div class="row"><span>Comisión total (5%)</span><b id="p-total">—</b></div>
+            <div class="row"><span>Nos comparten (<span id="p-pct-rec">—</span>)</span><b id="p-rec">—</b></div>
+            <div class="row"><span>Para tus asesores (<span id="p-pct-ase">—</span>)</span><b id="p-ase">—</b></div>
+            <div class="big"><span>Nos quedamos (<span id="p-pct-bn">—</span>)</span><b id="p-bn">—</b></div>
+            <p class="cmp" id="p-cmp"></p>
+          </div>
+        </div>
+      </div>
+      <p class="nota-ref">Propuesta en revisión: el porcentaje de cesión es ajustable y el reparto final con cada asesor se define por separado. Cálculo ilustrativo; no constituye una oferta.</p>
+
       <div class="hb" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><a class="btn nar" href="https://api.whatsapp.com/send?phone=525520603432&text=Hola%2C%20soy%20asesor%20y%20quiero%20referir%20a%20un%20cliente%20inversionista.%20%C2%BFMe%20comparten%20el%20esquema%20de%20comisiones%3F" target="_blank" rel="noopener">Quiero referir a un cliente</a><a class="btn borg" href="https://form.typeform.com/to/QGe5v9cR" target="_blank" rel="noopener">Formulario de perfil para tu cliente</a><a class="btn borg" href="inversion-internacional.html">Más información para presentar a tu cliente →</a></div>
     </div>
   </section>
@@ -477,6 +505,43 @@ div.doc span{flex:1}
   precio.addEventListener('input',function(){var n=num(precio.value);precio.value=n?n.toLocaleString('en-US'):'';calc();});
   tipo.addEventListener('change',calc);
   document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){rol=b.getAttribute('data-rol');document.querySelectorAll('.seg button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
+  calc();
+})();
+</script>
+<script>
+(function(){
+  var precio=document.getElementById('p-precio'),ces=document.getElementById('p-ces');
+  if(!precio||!ces)return;
+  var sup='directo',COM=.05,REC={directo:.5,comprador:.2},ASE_DIRECTO=.5;
+  function num(v){return +String(v).replace(/[^0-9.]/g,'')||0}
+  function usd(n){return 'USD '+Math.round(n).toLocaleString('en-US')}
+  function pc(n){return (Math.round(n*10000)/100)+'%'}
+  function $(id){return document.getElementById(id)}
+  function calc(){
+    var p=num(precio.value),total=p*COM,c=Math.min(100,Math.max(0,num(ces.value)))/100;
+    var rec=total*REC[sup],ase,bn,pctAse,nota;
+    if(sup==='directo'){ase=rec*ASE_DIRECTO;pctAse=COM*REC.directo*ASE_DIRECTO;}
+    else{ase=rec*c;pctAse=COM*REC.comprador*c;}
+    bn=rec-ase;
+    $('p-total').textContent=usd(total);
+    $('p-pct-rec').textContent=pc(COM*REC[sup]);
+    $('p-rec').textContent=usd(rec);
+    $('p-pct-ase').textContent=pc(pctAse);
+    $('p-ase').textContent=usd(ase);
+    $('p-pct-bn').textContent=pc(COM*REC[sup]-pctAse);
+    $('p-bn').textContent=usd(bn);
+    $('p-ces-wrap').hidden=sup!=='comprador';
+    $('p-supnota').textContent=sup==='directo'
+      ? 'Cliente directo: nos comparten el 50% de la comisión y nosotros compartimos el 50% de lo recibido con tus asesores.'
+      : 'Con asesor del comprador: nos comparten el 20% del referral fee. Lo que cedamos a tus asesores se toma de esa parte.';
+    var dif=p*COM*REC.directo*ASE_DIRECTO-ase;
+    $('p-cmp').innerHTML=sup==='directo'
+      ? 'Antes del reparto interno con cada asesor (pendiente de acuerdo).'
+      : (dif>0?'Frente a un cliente directo, tus asesores recibirían <b>'+usd(dif)+'</b> menos. Es la diferencia a cubrir para que les haga sentido.':'Tus asesores recibirían igual o más que con un cliente directo.');
+  }
+  precio.addEventListener('input',function(){var n=num(precio.value);precio.value=n?n.toLocaleString('en-US'):'';calc();});
+  ces.addEventListener('input',calc);
+  document.querySelectorAll('[data-sup]').forEach(function(b){b.addEventListener('click',function(){sup=b.getAttribute('data-sup');document.querySelectorAll('[data-sup]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
   calc();
 })();
 </script>
