@@ -416,18 +416,21 @@ div.doc span{flex:1}
           <div class="cin">
             <h3>Datos de la operación</h3>
             <p class="lbl2">¿Cómo llega el cliente?</p>
-            <div class="sg" role="group" aria-label="Cómo llega el cliente"><button type="button" data-psup="directo" aria-pressed="true">Cliente directo</button><button type="button" data-psup="comprador" aria-pressed="false">Con asesor del comprador</button></div>
+            <div class="sg" role="group" aria-label="Cómo llega el cliente"><button type="button" data-psup="directo" aria-pressed="true">Cliente directo</button><button type="button" data-psup="comprador" aria-pressed="false">Con asesor externo</button></div>
             <label>Precio de la propiedad (USD)
               <input id="p-precio" class="campo2" type="text" inputmode="numeric" value="500,000"></label>
-            <p class="lbl2">¿Cómo participas?</p>
-            <div class="sg" role="group" aria-label="Tu participación"><button type="button" data-prol="ref" aria-pressed="true">👥 Referidor · 12%</button><button type="button" data-prol="act" aria-pressed="false">🚀 Activo · 28%</button></div>
             <p class="pa-nota" id="p-supnota"></p>
           </div>
           <div class="cout">
-            <div class="row"><span>Comisión total de la operación (5%)</span><b id="p-total">—</b></div>
+            <div class="row"><span>Comisión total (5%)</span><b id="p-total">—</b></div>
+            <div class="row"><span>Asesor externo (40%)</span><b id="p-ext">—</b></div>
+            <div class="row"><span>Enlace Panamá (40%)</span><b id="p-enl">—</b></div>
             <div class="row"><span>Nos llega (<span id="p-pct-llega">—</span>)</span><b id="p-llega">—</b></div>
-            <div class="row"><span id="p-of-lbl">Se queda la oficina</span><b id="p-of">—</b></div>
-            <div class="big"><span>Te toca (<span id="p-pct-rol">—</span> de la comisión total)</span><b id="p-ase">—</b></div>
+            <div class="row"><span>IBA (50% de lo que nos llega)</span><b id="p-iba">—</b></div>
+            <div class="row"><span>Socio (bruto)</span><b id="p-bruto">—</b></div>
+            <div class="row"><span>Fee operativo (margen de México)</span><b id="p-fee">—</b></div>
+            <div class="row"><span>Oficina México</span><b id="p-mx">—</b></div>
+            <div class="big"><span>El socio recibe (<span id="p-pct-soc">—</span> de la comisión total)</span><b id="p-soc">—</b></div>
             <p class="cmp" id="p-cmp"></p>
           </div>
         </div>
@@ -534,31 +537,36 @@ div.doc span{flex:1}
 (function(){
   var precio=document.getElementById('p-precio');
   if(!precio)return;
-  var sup='directo',rol='ref';
-  var COM=.05,LLEGA={directo:.5,comprador:.2},PCT={ref:.12,act:.28};
+  var sup='directo';
+  var COM=.05,FEE=500;
   function num(v){return +String(v).replace(/[^0-9.]/g,'')||0}
   function usd(n){return 'USD '+Math.round(n).toLocaleString('en-US')}
   function pc(n){return (Math.round(n*10000)/100)+'%'}
   function $(id){return document.getElementById(id)}
   function calc(){
-    var p=num(precio.value),total=p*COM,llega=total*LLEGA[sup],ase=total*PCT[rol],of=llega-ase;
+    var p=num(precio.value),total=p*COM,ext=sup==='comprador';
+    var llega=total*(ext?.2:.5),iba=llega*.5,resto=llega-iba;
+    var bruto=ext?resto:resto*.6, fee=ext?FEE:0, neto=Math.max(0,bruto-fee), mx=ext?FEE:resto*.4;
     $('p-total').textContent=usd(total);
-    $('p-pct-llega').textContent=pc(COM*LLEGA[sup]);
+    $('p-ext').textContent=ext?usd(total*.4):'No aplica';
+    $('p-enl').textContent=ext?usd(total*.4):'No aplica';
+    $('p-pct-llega').textContent=pc(COM*(ext?.2:.5));
     $('p-llega').textContent=usd(llega);
-    $('p-of-lbl').textContent=of<0?'La oficina cubre':'Se queda la oficina';
-    $('p-of').textContent=usd(Math.abs(of));
-    $('p-pct-rol').textContent=Math.round(PCT[rol]*100)+'%';
-    $('p-ase').textContent=usd(ase);
-    $('p-supnota').textContent=sup==='directo'
-      ? 'Cliente directo: nos llega el 50% de la comisión total.'
-      : 'Con asesor del comprador: nos llega el 20% del referral fee, es decir, 1% del precio.';
-    $('p-cmp').innerHTML='Tu '+Math.round(PCT[rol]*100)+'% se calcula sobre la comisión total de '+usd(total)+', así que te toca <b>'+usd(ase)+'</b>. '
-      +(of<0?'Como a nosotros nos llegan '+usd(llega)+', la oficina cubre <b>'+usd(-of)+'</b> para que recibas el monto completo.'
-            :'De lo que nos llega ('+usd(llega)+'), la oficina se queda con <b>'+usd(of)+'</b>.');
+    $('p-iba').textContent=usd(iba);
+    $('p-bruto').textContent=usd(bruto);
+    $('p-fee').textContent=ext?'− '+usd(FEE):'No aplica';
+    $('p-mx').textContent=usd(mx);
+    $('p-pct-soc').textContent=pc(neto/total);
+    $('p-soc').textContent=usd(neto);
+    $('p-supnota').textContent=ext
+      ? 'Con asesor externo: el externo se queda 40%, el enlace 40% y nos llega 20%. Solo participa el referidor.'
+      : 'Cliente directo: nos llega el 50% de la comisión. IBA se queda con la mitad y el resto se reparte 60% socio y 40% México.';
+    $('p-cmp').innerHTML=ext
+      ? 'De lo que nos llega ('+usd(llega)+'), IBA toma '+usd(iba)+' y el socio recibe '+usd(bruto)+' menos el fee de '+usd(FEE)+': <b>'+usd(neto)+'</b>. México solo se queda con el fee.'
+      : 'De lo que nos llega ('+usd(llega)+'), IBA toma '+usd(iba)+'. Del resto ('+usd(resto)+'), el socio recibe 60% = <b>'+usd(neto)+'</b> y México 40% = '+usd(mx)+'.';
   }
   precio.addEventListener('input',function(){var n=num(precio.value);precio.value=n?n.toLocaleString('en-US'):'';calc();});
   document.querySelectorAll('[data-psup]').forEach(function(b){b.addEventListener('click',function(){sup=b.getAttribute('data-psup');document.querySelectorAll('[data-psup]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
-  document.querySelectorAll('[data-prol]').forEach(function(b){b.addEventListener('click',function(){rol=b.getAttribute('data-prol');document.querySelectorAll('[data-prol]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
   calc();
 })();
 </script>
