@@ -401,28 +401,28 @@ div.doc span{flex:1}
       <p class="nota-ref">Cálculo ilustrativo y aproximado; no constituye una oferta. El monto final depende de la operación y del acuerdo firmado.</p>
 
       <div class="calc-band" id="calculadora-panama" style="margin-top:28px">
-        <div class="cb-h"><span class="cb-ic" aria-hidden="true">🧮</span><div><p class="cb-k">Herramienta · Panamá</p><h3>¿Cuánto ganarías por referir a Panamá?</h3><p>Comisión del 5%. Elige cómo llega el cliente y cuánto cedemos a nuestros asesores.</p></div></div>
+        <div class="cb-h"><span class="cb-ic" aria-hidden="true">🧮</span><div><p class="cb-k">Herramienta · Panamá</p><h3>¿Cuánto te toca por referir a Panamá?</h3><p>Comisión total del 5%. Ves cuánto te corresponde y de dónde sale.</p></div></div>
         <div class="calc2">
           <div class="cin">
             <h3>Datos de la operación</h3>
             <p class="lbl2">¿Cómo llega el cliente?</p>
-            <div class="sg" role="group" aria-label="Supuesto"><button type="button" data-sup="directo" aria-pressed="true">Cliente directo</button><button type="button" data-sup="comprador" aria-pressed="false">Con asesor del comprador</button></div>
+            <div class="sg" role="group" aria-label="Cómo llega el cliente"><button type="button" data-psup="directo" aria-pressed="true">Cliente directo</button><button type="button" data-psup="comprador" aria-pressed="false">Con asesor del comprador</button></div>
             <label>Precio de la propiedad (USD)
               <input id="p-precio" class="campo2" type="text" inputmode="numeric" value="500,000"></label>
-            <label id="p-ces-wrap" hidden>Porcentaje de nuestra parte que cedemos a nuestros asesores
-              <input id="p-ces" class="campo2" type="text" inputmode="numeric" value="50"></label>
+            <p class="lbl2">¿Cómo participas?</p>
+            <div class="sg" role="group" aria-label="Tu participación"><button type="button" data-prol="ref" aria-pressed="true">👥 Referidor · 12%</button><button type="button" data-prol="act" aria-pressed="false">🚀 Activo · 28%</button></div>
             <p class="pa-nota" id="p-supnota"></p>
           </div>
           <div class="cout">
-            <div class="row"><span>Comisión total (5%)</span><b id="p-total">—</b></div>
-            <div class="row"><span>Nos comparten (<span id="p-pct-rec">—</span>)</span><b id="p-rec">—</b></div>
-            <div class="row"><span>Para tus asesores (<span id="p-pct-ase">—</span>)</span><b id="p-ase">—</b></div>
-            <div class="big"><span>Nos quedamos (<span id="p-pct-bn">—</span>)</span><b id="p-bn">—</b></div>
+            <div class="row"><span>Comisión total de la operación (5%)</span><b id="p-total">—</b></div>
+            <div class="row"><span>Nos llega (<span id="p-pct-llega">—</span>)</span><b id="p-llega">—</b></div>
+            <div class="row"><span id="p-of-lbl">Se queda la oficina</span><b id="p-of">—</b></div>
+            <div class="big"><span>Te toca (<span id="p-pct-rol">—</span> de la comisión total)</span><b id="p-ase">—</b></div>
             <p class="cmp" id="p-cmp"></p>
           </div>
         </div>
       </div>
-      <p class="nota-ref">Propuesta en revisión: el porcentaje de cesión es ajustable y el reparto final con cada asesor se define por separado. Cálculo ilustrativo; no constituye una oferta.</p>
+      <p class="nota-ref">Cálculo ilustrativo sobre la comisión total de Panamá (5%). El reparto final depende del acuerdo específico con cada asesor.</p>
 
       <div class="hb" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><a class="btn nar" href="https://api.whatsapp.com/send?phone=525520603432&text=Hola%2C%20soy%20asesor%20y%20quiero%20referir%20a%20un%20cliente%20inversionista.%20%C2%BFMe%20comparten%20el%20esquema%20de%20comisiones%3F" target="_blank" rel="noopener">Quiero referir a un cliente</a><a class="btn borg" href="https://form.typeform.com/to/QGe5v9cR" target="_blank" rel="noopener">Formulario de perfil para tu cliente</a><a class="btn borg" href="inversion-internacional.html">Más información para presentar a tu cliente →</a></div>
     </div>
@@ -494,7 +494,7 @@ div.doc span{flex:1}
     var p=num(precio.value),r=parseFloat(tipo.value)/100,total=p*r;
     function neto(k){return Math.max(0,total*PCT[k]-FEE[k]*PARTE_SOCIO)}
     document.getElementById('o-total').textContent=usd(total);
-    document.getElementById('o-pct').textContent=(PCT[rol]*100)+'%';
+    document.getElementById('o-pct').textContent=Math.round(PCT[rol]*100)+'%';
     document.getElementById('o-bruto').textContent=usd(total*PCT[rol]);
     document.getElementById('o-fee').textContent='− '+usd(FEE[rol]*PARTE_SOCIO);document.getElementById('o-feet').textContent=usd(FEE[rol]);
     document.getElementById('o-neto').textContent=usd(neto(rol));
@@ -510,38 +510,33 @@ div.doc span{flex:1}
 </script>
 <script>
 (function(){
-  var precio=document.getElementById('p-precio'),ces=document.getElementById('p-ces');
-  if(!precio||!ces)return;
-  var sup='directo',COM=.05,REC={directo:.5,comprador:.2},ASE_DIRECTO=.5;
+  var precio=document.getElementById('p-precio');
+  if(!precio)return;
+  var sup='directo',rol='ref';
+  var COM=.05,LLEGA={directo:.5,comprador:.2},PCT={ref:.12,act:.28};
   function num(v){return +String(v).replace(/[^0-9.]/g,'')||0}
   function usd(n){return 'USD '+Math.round(n).toLocaleString('en-US')}
   function pc(n){return (Math.round(n*10000)/100)+'%'}
   function $(id){return document.getElementById(id)}
   function calc(){
-    var p=num(precio.value),total=p*COM,c=Math.min(100,Math.max(0,num(ces.value)))/100;
-    var rec=total*REC[sup],ase,bn,pctAse,nota;
-    if(sup==='directo'){ase=rec*ASE_DIRECTO;pctAse=COM*REC.directo*ASE_DIRECTO;}
-    else{ase=rec*c;pctAse=COM*REC.comprador*c;}
-    bn=rec-ase;
+    var p=num(precio.value),total=p*COM,llega=total*LLEGA[sup],ase=total*PCT[rol],of=llega-ase;
     $('p-total').textContent=usd(total);
-    $('p-pct-rec').textContent=pc(COM*REC[sup]);
-    $('p-rec').textContent=usd(rec);
-    $('p-pct-ase').textContent=pc(pctAse);
+    $('p-pct-llega').textContent=pc(COM*LLEGA[sup]);
+    $('p-llega').textContent=usd(llega);
+    $('p-of-lbl').textContent=of<0?'La oficina cubre':'Se queda la oficina';
+    $('p-of').textContent=usd(Math.abs(of));
+    $('p-pct-rol').textContent=Math.round(PCT[rol]*100)+'%';
     $('p-ase').textContent=usd(ase);
-    $('p-pct-bn').textContent=pc(COM*REC[sup]-pctAse);
-    $('p-bn').textContent=usd(bn);
-    $('p-ces-wrap').hidden=sup!=='comprador';
     $('p-supnota').textContent=sup==='directo'
-      ? 'Cliente directo: nos comparten el 50% de la comisión y nosotros compartimos el 50% de lo recibido con tus asesores.'
-      : 'Con asesor del comprador: nos comparten el 20% del referral fee. Lo que cedamos a tus asesores se toma de esa parte.';
-    var dif=p*COM*REC.directo*ASE_DIRECTO-ase;
-    $('p-cmp').innerHTML=sup==='directo'
-      ? 'Antes del reparto interno con cada asesor (pendiente de acuerdo).'
-      : (dif>0?'Frente a un cliente directo, tus asesores recibirían <b>'+usd(dif)+'</b> menos. Es la diferencia a cubrir para que les haga sentido.':'Tus asesores recibirían igual o más que con un cliente directo.');
+      ? 'Cliente directo: nos llega el 50% de la comisión total.'
+      : 'Con asesor del comprador: nos llega el 20% del referral fee, es decir, 1% del precio.';
+    $('p-cmp').innerHTML='Tu '+Math.round(PCT[rol]*100)+'% se calcula sobre la comisión total de '+usd(total)+', así que te toca <b>'+usd(ase)+'</b>. '
+      +(of<0?'Como a nosotros nos llegan '+usd(llega)+', la oficina cubre <b>'+usd(-of)+'</b> para que recibas el monto completo.'
+            :'De lo que nos llega ('+usd(llega)+'), la oficina se queda con <b>'+usd(of)+'</b>.');
   }
   precio.addEventListener('input',function(){var n=num(precio.value);precio.value=n?n.toLocaleString('en-US'):'';calc();});
-  ces.addEventListener('input',calc);
-  document.querySelectorAll('[data-sup]').forEach(function(b){b.addEventListener('click',function(){sup=b.getAttribute('data-sup');document.querySelectorAll('[data-sup]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
+  document.querySelectorAll('[data-psup]').forEach(function(b){b.addEventListener('click',function(){sup=b.getAttribute('data-psup');document.querySelectorAll('[data-psup]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
+  document.querySelectorAll('[data-prol]').forEach(function(b){b.addEventListener('click',function(){rol=b.getAttribute('data-prol');document.querySelectorAll('[data-prol]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
   calc();
 })();
 </script>
