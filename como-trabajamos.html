@@ -244,6 +244,9 @@ div.doc span{flex:1}
 .sg button{border:1.5px solid var(--linea);background:#fff;border-radius:12px;padding:12px;font:700 14px var(--f);cursor:pointer;color:var(--gris)}
 .sg button[aria-pressed=true]{background:var(--naranja);border-color:var(--naranja);color:#fff}
 .pa-nota{font-size:12.5px;color:#C9D4E0;margin:0}
+.ctabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px}
+.ctabs button{border:1.5px solid var(--linea);background:#fff;border-radius:999px;padding:10px 18px;font:700 15px var(--f);cursor:pointer;color:var(--azul);min-height:44px}
+.ctabs button[aria-selected=true]{background:var(--azul);border-color:var(--azul);color:#fff}
 @media (max-width:520px){.calc-band{padding:16px;border-radius:20px}.cb-ic{width:46px;height:46px;font-size:22px}}
 /* cómo trabajamos: cifras y lo que nos rige */
 #como .cifras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;background:var(--azul);color:#fff;margin-top:26px}
@@ -377,6 +380,11 @@ div.doc span{flex:1}
       </div>
       <p class="nota-ref">Ejemplos con una propiedad de USD 500,000, antes del fee operativo. Los porcentajes pueden variar según el tipo de proyecto y el acuerdo específico de la alianza IBA + Brokers Network.</p>
 
+      <div class="ctabs" role="tablist" aria-label="Calculadoras por país">
+        <button type="button" role="tab" id="tb-usa" aria-selected="true" aria-controls="tab-usa" data-tab="usa">🇺🇸 Estados Unidos</button>
+        <button type="button" role="tab" id="tb-pan" aria-selected="false" aria-controls="tab-pan" data-tab="pan" tabindex="-1">🇵🇦 Panamá</button>
+      </div>
+      <div id="tab-usa" role="tabpanel" aria-labelledby="tb-usa">
       <div class="calc-band" id="calculadora">
         <div class="cb-h"><span class="cb-ic" aria-hidden="true">🧮</span><div><p class="cb-k">Herramienta</p><h3>¿Cuánto ganarías por referir?</h3><p>Elige el tipo de operación, el precio y cómo participas.</p></div></div>
       <div class="calc2">
@@ -399,7 +407,9 @@ div.doc span{flex:1}
       </div>
       </div>
       <p class="nota-ref">Cálculo ilustrativo y aproximado; no constituye una oferta. El monto final depende de la operación y del acuerdo firmado.</p>
+      </div>
 
+      <div id="tab-pan" role="tabpanel" aria-labelledby="tb-pan" hidden>
       <div class="calc-band" id="calculadora-panama" style="margin-top:28px">
         <div class="cb-h"><span class="cb-ic" aria-hidden="true">🧮</span><div><p class="cb-k">Herramienta · Panamá</p><h3>¿Cuánto te toca por referir a Panamá?</h3><p>Comisión total del 5%. Ves cuánto te corresponde y de dónde sale.</p></div></div>
         <div class="calc2">
@@ -423,6 +433,7 @@ div.doc span{flex:1}
         </div>
       </div>
       <p class="nota-ref">Cálculo ilustrativo sobre la comisión total de Panamá (5%). El reparto final depende del acuerdo específico con cada asesor.</p>
+      </div>
 
       <div class="hb" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><a class="btn nar" href="https://api.whatsapp.com/send?phone=525520603432&text=Hola%2C%20soy%20asesor%20y%20quiero%20referir%20a%20un%20cliente%20inversionista.%20%C2%BFMe%20comparten%20el%20esquema%20de%20comisiones%3F" target="_blank" rel="noopener">Quiero referir a un cliente</a><a class="btn borg" href="https://form.typeform.com/to/QGe5v9cR" target="_blank" rel="noopener">Formulario de perfil para tu cliente</a><a class="btn borg" href="inversion-internacional.html">Más información para presentar a tu cliente →</a></div>
     </div>
@@ -506,6 +517,17 @@ div.doc span{flex:1}
   tipo.addEventListener('change',calc);
   document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){rol=b.getAttribute('data-rol');document.querySelectorAll('.seg button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
   calc();
+})();
+</script>
+<script>
+(function(){
+  var bs=document.querySelectorAll('.ctabs [data-tab]');
+  bs.forEach(function(b){b.addEventListener('click',function(){
+    var t=b.getAttribute('data-tab');
+    bs.forEach(function(x){var on=x===b;x.setAttribute('aria-selected',on?'true':'false');x.tabIndex=on?0:-1});
+    document.getElementById('tab-usa').hidden=t!=='usa';
+    document.getElementById('tab-pan').hidden=t!=='pan';
+  });});
 })();
 </script>
 <script>
