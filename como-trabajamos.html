@@ -531,18 +531,13 @@ div.doc span{flex:1}
   function $(id){return document.getElementById(id)}
   function calc(){
     var p=num(precio.value),total=p*COM,ext=sup==='comprador';
-    var llega=total*(ext?.2:.5),ibaBruto=llega*.5,resto=llega-ibaBruto;
-    var aporteFee=ext?FEE/2:0;
-    var iba=ibaBruto-aporteFee;
-    var bruto=ext?resto:resto*.6, neto=bruto-aporteFee, mx=ext?FEE:resto*.4;
+    var neto=ext?total*.1:total*.25;
     $('p-pct-soc').textContent=pc(neto/total);
     $('p-soc').textContent=usd(neto);
     $('p-supnota').textContent=ext
       ? 'Con asesor externo: solo participa el referidor.'
       : 'Cliente directo.';
-    $('p-cmp').innerHTML=ext
-      ? 'Ya descontado el fee operativo de '+usd(aporteFee*2)+'.'
-      : 'Es el monto neto que recibes por la operación.';
+    $('p-cmp').innerHTML='Es el monto que recibes por la operación.';
   }
   precio.addEventListener('input',function(){var n=num(precio.value);precio.value=n?n.toLocaleString('en-US'):'';calc();});
   document.querySelectorAll('[data-psup]').forEach(function(b){b.addEventListener('click',function(){sup=b.getAttribute('data-psup');document.querySelectorAll('[data-psup]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});

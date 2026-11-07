@@ -336,13 +336,12 @@ document.getElementById('bnSalir').onclick=function(){BN.salir();location.replac
           } else {
             total=p*.05;
             if(s.caso==='externo'){
-              var sb=.2*total*.5;
-              L=[['Asesor externo (40%)',.4*total],['Enlace Panamá (40%)',.4*total],['IBA neto (50% de lo que llega, menos USD 250 de fee)',sb-250],['Socio neto (solo referidor, menos USD 250 de fee)',sb-250],['Oficina México (fee operativo)',500]];
-              note='Con asesor externo: el socio recibe el 100% de la mitad que le toca a la alianza; el fee de USD 500 lo aportan IBA y el socio, y México lo recibe completo.';
+              L=[['Asesor externo (40% del total)',.4*total],['Enlace Panamá (40% del total)',.4*total],['Socio (10% del total)',.1*total],['IBA (8% del total)',.08*total],['Oficina México (fee operativo, 2% del total)',.02*total]];
+              note='Con asesor externo: el externo se queda 40% y el enlace 40%. Del 20% restante, el socio recibe USD 2,500 y IBA USD 2,000; los USD 500 que sobran son el fee operativo para México.';
             } else {
-              var ll=.5*total, ib=ll*.5, resto=ll-ib;
-              L=[['IBA (50% de lo que llega)',ib],['Socio (60% del resto)',resto*.6],['Oficina México (40% del resto)',resto*.4]];
-              note='Cliente directo: nos llega el 50% del 5%. IBA se queda con la mitad y el resto se reparte 60% socio y 40% México. Sin fee.';
+              var base=.5*total;
+              L=[['Socio (50% de lo que llega)',base*.5],['IBA (25% de lo que llega)',base*.25],['Oficina México (25% de lo que llega)',base*.25]];
+              note='Cliente directo: el enlace se queda con el 2.5% del 5%. Del 2.5%, el socio recibe 50%, IBA 25% y Oficina México 25%.';
             }
           }
           $('dr-total').textContent=usd(total);
