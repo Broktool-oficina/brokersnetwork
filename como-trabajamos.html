@@ -398,10 +398,7 @@ div.doc span{flex:1}
           <div class="seg" role="radiogroup"><button type="button" data-rol="pas" aria-pressed="true">👥 Referidor · 12%</button><button type="button" data-rol="act" aria-pressed="false">🚀 Activo · 28%</button></div>
         </div>
         <div class="cout">
-          <div class="row"><span>Comisión total de la operación</span><b id="o-total">—</b></div>
-          <div class="row"><span>Tu participación (<span id="o-pct">12%</span>)</span><b id="o-bruto">—</b></div>
-          <div class="row"><span>Fee operativo (<span id="o-feet">—</span>, 50% Brokers Network)</span><b id="o-fee">—</b></div>
-          <div class="big"><span>Recibirías aproximadamente</span><b id="o-neto">—</b></div>
+          <div class="big"><span>Recibirías aproximadamente (<span id="o-pct">12%</span> de la comisión total)</span><b id="o-neto">—</b></div>
           <p class="cmp" id="o-cmp"></p>
         </div>
       </div>
@@ -422,14 +419,7 @@ div.doc span{flex:1}
             <p class="pa-nota" id="p-supnota"></p>
           </div>
           <div class="cout">
-            <div class="row"><span>Comisión total (5%)</span><b id="p-total">—</b></div>
-            <div class="row"><span>Asesor externo (40%)</span><b id="p-ext">—</b></div>
-            <div class="row"><span>Enlace Panamá (40%)</span><b id="p-enl">—</b></div>
-            <div class="row"><span>Nos llega (<span id="p-pct-llega">—</span>)</span><b id="p-llega">—</b></div>
-            <div class="row"><span>IBA (neto, tras aportar fee)</span><b id="p-iba">—</b></div>
-            <div class="row"><span>Socio (bruto)</span><b id="p-bruto">—</b></div>
-            <div class="row"><span>Oficina México (fee operativo)</span><b id="p-mx">—</b></div>
-            <div class="big"><span>El socio recibe (<span id="p-pct-soc">—</span> de la comisión total)</span><b id="p-soc">—</b></div>
+            <div class="big"><span>Recibirías aproximadamente (<span id="p-pct-soc">—</span> de la comisión total)</span><b id="p-soc">—</b></div>
             <p class="cmp" id="p-cmp"></p>
           </div>
         </div>
@@ -500,16 +490,13 @@ div.doc span{flex:1}
 (function(){
   var tipo=document.getElementById('c-tipo'),precio=document.getElementById('c-precio'),rol='pas';
   if(!tipo)return;
-  var PCT={pas:.12,act:.28},FEE={pas:1000,act:500},PARTE_SOCIO=.5;
+  var PCT={pas:.12,act:.28},FEE={pas:1000,act:500};
   function num(v){return +String(v).replace(/[^0-9.]/g,'')||0}
   function usd(n){return 'USD '+Math.round(n).toLocaleString('en-US')}
   function calc(){
     var p=num(precio.value),r=parseFloat(tipo.value)/100,total=p*r;
-    function neto(k){return Math.max(0,total*PCT[k]-FEE[k]*PARTE_SOCIO)}
-    document.getElementById('o-total').textContent=usd(total);
+    function neto(k){return Math.max(0,total*PCT[k]-FEE[k])}
     document.getElementById('o-pct').textContent=Math.round(PCT[rol]*100)+'%';
-    document.getElementById('o-bruto').textContent=usd(total*PCT[rol]);
-    document.getElementById('o-fee').textContent='− '+usd(FEE[rol]*PARTE_SOCIO);document.getElementById('o-feet').textContent=usd(FEE[rol]);
     document.getElementById('o-neto').textContent=usd(neto(rol));
     var otro=rol==='pas'?'act':'pas';
     document.getElementById('o-cmp').innerHTML=rol==='pas'?'Como <b>socio activo</b> recibirías aprox. <b>'+usd(neto('act'))+'</b>.':'Como <b>socio referidor</b> recibirías aprox. <b>'+usd(neto('pas'))+'</b>.';
@@ -548,22 +535,14 @@ div.doc span{flex:1}
     var aporteFee=ext?FEE/2:0;
     var iba=ibaBruto-aporteFee;
     var bruto=ext?resto:resto*.6, neto=bruto-aporteFee, mx=ext?FEE:resto*.4;
-    $('p-total').textContent=usd(total);
-    $('p-ext').textContent=ext?usd(total*.4):'No aplica';
-    $('p-enl').textContent=ext?usd(total*.4):'No aplica';
-    $('p-pct-llega').textContent=pc(COM*(ext?.2:.5));
-    $('p-llega').textContent=usd(llega);
-    $('p-iba').textContent=usd(iba);
-    $('p-bruto').textContent=usd(bruto);
-    $('p-mx').textContent=usd(mx);
     $('p-pct-soc').textContent=pc(neto/total);
     $('p-soc').textContent=usd(neto);
     $('p-supnota').textContent=ext
-      ? 'Con asesor externo: el externo se queda 40%, el enlace 40% y nos llega 20%. Solo participa el referidor.'
-      : 'Cliente directo: nos llega el 50% de la comisión. IBA se queda con la mitad y el resto se reparte 60% socio y 40% México.';
+      ? 'Con asesor externo: solo participa el referidor.'
+      : 'Cliente directo.';
     $('p-cmp').innerHTML=ext
-      ? 'De lo que nos llega ('+usd(llega)+'), IBA toma '+usd(ibaBruto)+' y el socio recibe '+usd(bruto)+'. Cada uno aporta '+usd(aporteFee)+' de fee: IBA queda con '+usd(iba)+' y el socio con <b>'+usd(neto)+'</b>. México recibe '+usd(mx)+' de fee.'
-      : 'De lo que nos llega ('+usd(llega)+'), IBA toma '+usd(ibaBruto)+'. Del resto ('+usd(resto)+'), el socio recibe 60% = <b>'+usd(neto)+'</b> y México 40% = '+usd(mx)+'.';
+      ? 'Ya descontado el fee operativo de '+usd(aporteFee*2)+'.'
+      : 'Es el monto neto que recibes por la operación.';
   }
   precio.addEventListener('input',function(){var n=num(precio.value);precio.value=n?n.toLocaleString('en-US'):'';calc();});
   document.querySelectorAll('[data-psup]').forEach(function(b){b.addEventListener('click',function(){sup=b.getAttribute('data-psup');document.querySelectorAll('[data-psup]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});calc();});});
