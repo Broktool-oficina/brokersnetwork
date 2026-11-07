@@ -278,6 +278,85 @@ document.getElementById('bnSalir').onclick=function(){BN.salir();location.replac
         <div class="doc"><b>5. Financiamiento para extranjeros en EUA</b><span>Créditos Foreign National con 1st Capital Lending Group.</span><em><a href="https://youtu.be/D7kRee9KcMk" target="_blank" rel="noopener">Ver grabación</a></em><em><a href="https://docs.google.com/presentation/d/1-C20RTArdzbw4VQOLXUH7lGMqTm4BBAuL2agTnloMYM/edit?usp=sharing" target="_blank" rel="noopener">Presentación</a></em></div>
         <div class="doc"><b>6. Después del cierre y tu portafolio</b><span>Administración de propiedades, rentas cortas y largas, contabilidad, planeación sucesoria y cómo construir un portafolio de inversión.</span><em><a href="https://youtu.be/A-sKNZPjWa0" target="_blank" rel="noopener">Ver grabación</a></em><em><a href="https://drive.google.com/file/d/1ENb_8adXEU-OKMRPzK6v3-PU847tfCRj/view?usp=sharing" target="_blank" rel="noopener">Presentación</a></em></div>
       </div>
+      <div class="calc-band" id="adm-desg" style="margin-top:34px">
+        <div class="cb-h"><span class="cb-ic" aria-hidden="true">🧮</span><div><p class="cb-k">Interno · Desglose</p><h3>Calculadora con todo el desglose</h3><p>Reparto completo de cada operación: asesor externo, enlace, IBA, socio, oficina México y fee. Cifras en USD.</p></div></div>
+        <div class="calc2">
+          <div class="cin">
+            <h3>Datos de la operación</h3>
+            <p class="lbl2">País</p>
+            <div class="seg" role="group" aria-label="País"><button type="button" data-dpais="usa" aria-pressed="true">🇺🇸 USA</button><button type="button" data-dpais="pan" aria-pressed="false">🇵🇦 Panamá</button></div>
+            <label>Precio de la propiedad (USD)
+              <input id="d-precio" class="campo2" type="text" inputmode="numeric" value="500,000"></label>
+            <label id="d-tipo-wrap">Tipo de operación
+              <select id="d-tipo" class="campo2"><option value="6">Preconstrucción · 6%</option><option value="5">Usada con exclusiva · 5%</option><option value="3">Comisión compartida · 3%</option></select></label>
+            <p class="lbl2">¿Cómo llega el cliente?</p>
+            <div class="seg" role="group" aria-label="Cómo llega"><button type="button" data-dcaso="directo" aria-pressed="true">Directo / sin externo</button><button type="button" data-dcaso="externo" aria-pressed="false">Con asesor externo</button></div>
+            <div id="d-rol-wrap">
+              <p class="lbl2">Socio que participa (USA)</p>
+              <div class="seg" role="group" aria-label="Socio"><button type="button" data-drol="ref" aria-pressed="true">👥 Referidor</button><button type="button" data-drol="act" aria-pressed="false">🚀 Activo</button></div>
+            </div>
+          </div>
+          <div class="cout">
+            <div class="row"><span>Comisión total</span><b id="dr-total">—</b></div>
+            <div id="dr-lines"></div>
+            <p class="cmp" id="dr-note"></p>
+          </div>
+        </div>
+      </div>
+      <style>#adm-desg .seg button[aria-pressed=true]{background:var(--naranja);border-color:var(--naranja);color:#fff}#adm-desg .seg button:disabled{opacity:.4;cursor:not-allowed}</style>
+      <script>
+      (function(){
+        var P=document.getElementById('d-precio'); if(!P)return;
+        var s={pais:'usa',caso:'directo',rol:'ref'};
+        function $(id){return document.getElementById(id)}
+        function num(v){return +String(v).replace(/[^0-9.]/g,'')||0}
+        function usd(n){return 'USD '+Math.round(n).toLocaleString('en-US')}
+        function row(k,v){return '<div class="row"><span>'+k+'</span><b>'+v+'</b></div>'}
+        function press(attr,val){document.querySelectorAll('['+attr+']').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute(attr)===val?'true':'false')})}
+        function calc(){
+          var usa=s.pais==='usa', tipo=$('d-tipo').value, p=num(P.value);
+          var tres=usa&&tipo==='3';
+          if(tres&&s.caso==='externo'){s.caso='directo';}
+          $('d-tipo-wrap').hidden=!usa; $('d-rol-wrap').hidden=!usa;
+          document.querySelectorAll('[data-dcaso=externo]').forEach(function(b){b.disabled=tres});
+          press('data-dpais',s.pais); press('data-dcaso',s.caso); press('data-drol',s.rol);
+          var total,L=[],note='';
+          if(usa){
+            total=p*parseFloat(tipo)/100;
+            var fee=s.rol==='ref'?1000:500, pct=s.rol==='ref'?.3:.7, lbl=s.rol==='ref'?'30%':'70%';
+            if(s.caso==='externo'){
+              var bolsa=.2*total, bruto=bolsa*pct, neto=Math.max(0,bruto-fee);
+              L=[['Asesor externo (50%)',.5*total],['IBA / oficina USA (30%)',.3*total],['Oficina México (resto de la bolsa)',bolsa-bruto],['Socio neto ('+lbl+' de la bolsa, menos fee)',neto],['Fee operativo (Brokers Network)',fee]];
+              note='Bolsa de 20% del total. El socio recibe '+lbl+' de la bolsa; México, el resto.'+(bruto-fee<0?' Atención: el fee supera lo que le toca al socio.':'');
+            } else {
+              var bolsa2=.4*total, bruto2=bolsa2*pct, neto2=Math.max(0,bruto2-fee);
+              L=[['IBA / oficina USA (60%)',.6*total],['Oficina México (resto de la bolsa)',bolsa2-bruto2],['Socio neto ('+lbl+' de la bolsa, menos fee)',neto2],['Fee operativo (Brokers Network)',fee]];
+              note='Bolsa de 40% del total. El socio recibe '+lbl+' de la bolsa; México, el resto.';
+            }
+          } else {
+            total=p*.05;
+            if(s.caso==='externo'){
+              var sb=.2*total*.5;
+              L=[['Asesor externo (40%)',.4*total],['Enlace Panamá (40%)',.4*total],['IBA neto (50% de lo que llega, menos USD 250 de fee)',sb-250],['Socio neto (solo referidor, menos USD 250 de fee)',sb-250],['Oficina México (fee operativo)',500]];
+              note='Con asesor externo: el socio recibe el 100% de la mitad que le toca a la alianza; el fee de USD 500 lo aportan IBA y el socio, y México lo recibe completo.';
+            } else {
+              var ll=.5*total, ib=ll*.5, resto=ll-ib;
+              L=[['IBA (50% de lo que llega)',ib],['Socio (60% del resto)',resto*.6],['Oficina México (40% del resto)',resto*.4]];
+              note='Cliente directo: nos llega el 50% del 5%. IBA se queda con la mitad y el resto se reparte 60% socio y 40% México. Sin fee.';
+            }
+          }
+          $('dr-total').textContent=usd(total);
+          $('dr-lines').innerHTML=L.map(function(x){return row(x[0],usd(x[1]))}).join('');
+          $('dr-note').textContent=note;
+        }
+        document.querySelectorAll('[data-dpais]').forEach(function(b){b.addEventListener('click',function(){s.pais=b.getAttribute('data-dpais');calc();});});
+        document.querySelectorAll('[data-dcaso]').forEach(function(b){b.addEventListener('click',function(){s.caso=b.getAttribute('data-dcaso');calc();});});
+        document.querySelectorAll('[data-drol]').forEach(function(b){b.addEventListener('click',function(){s.rol=b.getAttribute('data-drol');calc();});});
+        $('d-tipo').addEventListener('change',calc);
+        P.addEventListener('input',function(){var n=num(P.value);P.value=n?n.toLocaleString('en-US'):'';calc();});
+        calc();
+      })();
+      </script>
       <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn wa" data-share-usa href="https://api.whatsapp.com/send" target="_blank" rel="noopener">Compartir materiales por WhatsApp</a><button class="btn borg" type="button" data-copy-usa>Copiar acceso a materiales</button></div>
       <p style="margin:18px 0 0;font-size:14px;color:#C9D4E0">El inventario y los precios actualizados, y el grupo oficial de socios, se comparten con los afiliados por WhatsApp.</p>
     </div>
