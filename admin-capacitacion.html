@@ -346,7 +346,8 @@ document.getElementById('bnSalir').onclick=function(){BN.salir();location.replac
             }
           }
           $('dr-total').textContent=usd(total);
-          $('dr-lines').innerHTML=L.map(function(x){return row(x[0],usd(x[1]))}).join('');
+          function pc(n){return total?(Math.round(n/total*1000)/10)+'%':'0%'}
+          $('dr-lines').innerHTML=L.map(function(x){return row(x[0],usd(x[1])+' <small style="opacity:.75;font-weight:600">('+pc(x[1])+')</small>')}).join('');
           $('dr-note').textContent=note;
         }
         document.querySelectorAll('[data-dpais]').forEach(function(b){b.addEventListener('click',function(){s.pais=b.getAttribute('data-dpais');calc();});});
