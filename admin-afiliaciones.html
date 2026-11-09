@@ -143,6 +143,7 @@ textarea.campo{min-height:80px;resize:vertical}
       <label>Inmobiliaria<input class="campo" name="inmobiliaria"></label>
     </div>
     <label>Notas<textarea class="campo" name="notas"></textarea></label>
+    <label>Notas de la entrevista<textarea class="campo" name="notasEntrevista" placeholder="Qué platicaron, perfil, dudas, siguientes pasos…"></textarea></label>
     <div class="acc"><button class="btn lin" type="button" id="cancelar">Cancelar</button><button class="btn nar" type="submit">Guardar</button></div>
   </form>
 </div>
@@ -162,7 +163,7 @@ textarea.campo{min-height:80px;resize:vertical}
 </section>
 
 <div class="toast" id="toast" hidden></div>
-<footer class="vers" id="vers">Versión 2026.11.04 · tracker de afiliados</footer>
+<footer class="vers" id="vers">Versión 2026.11.09 · tracker de afiliados</footer>
 
 <script>
 (function(){
@@ -177,7 +178,7 @@ textarea.campo{min-height:80px;resize:vertical}
   function etapa(r){return r.estado&&EST[r.estado]?r.estado:"nuevo"}
   function anterior(k){var i=FLUJO.indexOf(k);return i>0?FLUJO[i-1]:null}
   function siguiente(k){var i=FLUJO.indexOf(k);return i>=0&&i<FLUJO.length-1?FLUJO[i+1]:null}
-  var CAMPOS=['nombre','cel','correo','correoBN','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas'];
+  var CAMPOS=['nombre','cel','correo','correoBN','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','notasEntrevista'];
 
   var WA_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.9 2.9 4.6 4 1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3Z"/></svg>';
 
@@ -243,6 +244,7 @@ textarea.campo{min-height:80px;resize:vertical}
       +(r.cel?'<a class="tel" target="_blank" rel="noopener" href="'+waHref(r.cel,"")+'">'+WA_SVG+'<span>'+esc(r.cel)+'</span></a>':'')
       +(r.correo||r.correoBN?'<div class="meta">'+(r.correoBN?'<span>🏢 '+esc(r.correoBN)+'</span>':'')+(r.correo?'<span>✉️ '+esc(r.correo)+'</span>':'')+'</div>':'')
       +(r.notas?'<p class="notas">'+esc(r.notas)+'</p>':'')
+      +(r.notasEntrevista?'<p class="notas"><b>📝 Entrevista:</b> '+esc(r.notasEntrevista)+'</p>':'')
       +'</div>'
       +'<div class="card-foot"><div class="cf-msgs">'
       +(desc?'':'<button type="button" class="wabtn" data-act="enviar" title="Enviar mensaje de '+esc(st[1])+' por WhatsApp">'+WA_SVG+'<span>Enviar mensaje</span></button>')
@@ -336,7 +338,7 @@ textarea.campo{min-height:80px;resize:vertical}
     if(act==='eliminar'){if(col&&confirm('¿Eliminar a '+(r.nombre||'este interesado')+'?'))col.doc(r.id).delete().catch(function(){aviso('No se pudo eliminar.')});return}
   });
 
-  $('csv').onclick=function(){var cols=['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','creado'];
+  $('csv').onclick=function(){var cols=['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','notasEntrevista','creado'];
     var csv=[cols.join(',')].concat(rows.map(function(r){return cols.map(function(k){var v=k==='estado'?label(etapa(r)):(r[k]||'');return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')})).join('\n');
     var blob=new Blob(['\ufeff'+csv],{type:'text/csv'});use('downloads').then(function(dl){if(dl)return dl.save({filename:'afiliaciones-bn.csv',data:blob});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='afiliaciones-bn.csv';a.click()}).catch(function(){})};
 
