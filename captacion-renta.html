@@ -232,7 +232,7 @@ Te comparto también los requisitos de documentación para integrar el expedient
 <div class="card">
   <button class="copiar" type="button" id="exportar">Exportar para WhatsApp</button>
   <button class="copiar" type="button" id="descargar" style="background:var(--azul);margin-left:8px">Descargar .txt</button>
-  <label class="campo" style="margin-top:12px"><span>Vista previa del resumen</span><textarea id="resumen" readonly style="min-height:160px"></textarea></label>
+  <label class="campo" style="margin-top:12px"><span>Vista previa del resumen (se actualiza sola mientras llenas la guía)</span><textarea id="resumen" readonly style="min-height:160px"></textarea></label>
 </div>
 
 <div class="card" style="margin-top:24px">
@@ -252,8 +252,8 @@ Te comparto también los requisitos de documentación para integrar el expedient
   function save(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
   var d=load();
   boxes.forEach(function(b,i){var id='c'+i;b.dataset.id=id;if(d[id])b.checked=true;b.addEventListener('change',function(){d[id]=b.checked;save(d);prog()})});
-  campos.forEach(function(c,i){var id='t'+i;c.dataset.id=id;if(d[id]!=null)c.value=d[id];c.addEventListener('input',function(){d[id]=c.value;save(d)})});
-  function prog(){var n=boxes.length,ok=boxes.filter(function(b){return b.checked}).length;document.getElementById('barra').style.width=(n?Math.round(ok/n*100):0)+'%';document.getElementById('progTxt').textContent=ok+' de '+n+' completados'}
+  campos.forEach(function(c,i){var id='t'+i;c.dataset.id=id;if(d[id]!=null)c.value=d[id];c.addEventListener('input',function(){d[id]=c.value;save(d);refrescar()})});
+  function prog(){var n=boxes.length,ok=boxes.filter(function(b){return b.checked}).length;document.getElementById('barra').style.width=(n?Math.round(ok/n*100):0)+'%';document.getElementById('progTxt').textContent=ok+' de '+n+' completados';refrescar()}
   document.getElementById('reset').addEventListener('click',function(){if(!confirm('¿Reiniciar todo el checklist?'))return;boxes.forEach(function(b){b.checked=false});campos.forEach(function(c){c.value=''});d={};save(d);prog()});
   document.getElementById('copiar').addEventListener('click',function(){var t=document.getElementById('msg').textContent,btn=this;
     function ok(){btn.textContent='Copiado ✓';setTimeout(function(){btn.textContent='Copiar mensaje'},2000)}
@@ -280,6 +280,7 @@ Te comparto también los requisitos de documentación para integrar el expedient
     L.push('*Observaciones:* '+(document.getElementById('obs').value.trim()||'—'));
     return L.join('\n');
   }
+  function refrescar(){var el=document.getElementById('resumen');if(el)el.value=resumen()}
   document.getElementById('exportar').addEventListener('click',function(){
     var t=resumen(),prev=document.getElementById('resumen'),btn=this;
     prev.value=t;
