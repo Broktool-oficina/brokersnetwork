@@ -259,7 +259,7 @@ Te comparto también los requisitos de documentación para integrar el expedient
     function ok(){btn.textContent='Copiado ✓';setTimeout(function(){btn.textContent='Copiar mensaje'},2000)}
     function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById('msg'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selecciónalo y cópialo'}
     try{navigator.clipboard.writeText(t).then(ok,sel)}catch(e){sel()}});
-  function resumen(){
+  function resumen(corto){
     function v(id){return (document.getElementById(id).value||'').trim()||'—'}
     var L=['*CHECKLIST · CAPTACIÓN EN RENTA (Proceso 01)*','Broker: '+v('nombre'),'Fecha: '+v('fecha'),'Dirección: '+v('direccion'),'Atiende: '+v('contacto'),''];
     L.push('*Respuestas del propietario*');
@@ -275,21 +275,20 @@ Te comparto también los requisitos de documentación para integrar el expedient
     [].forEach.call(document.querySelectorAll('.card label.check'),function(lb){
       var cb=lb.querySelector('input');if(cb&&!cb.checked)pend.push(lb.textContent.trim());
     });
-    if(pend.length){L.push('*Pendientes:*');pend.forEach(function(x){L.push('- '+x)})}
+    if(pend.length){if(corto){L.push('*Pendientes:* '+pend.length+' pasos (completos en el .txt)')}else{L.push('*Pendientes:*');pend.forEach(function(x){L.push('- '+x)})}}
     L.push('');
     L.push('*Observaciones:* '+(document.getElementById('obs').value.trim()||'—'));
     return L.join('\n');
   }
-  function refrescar(){var el=document.getElementById('resumen');if(el)el.value=resumen()}
+  function refrescar(){var el=document.getElementById('resumen');if(el)el.value=resumen(true)}
   document.getElementById('exportar').addEventListener('click',function(){
-    var t=resumen(),prev=document.getElementById('resumen'),btn=this;
+    var t=resumen(true),prev=document.getElementById('resumen');
     prev.value=t;
-    if(navigator.share){navigator.share({text:t}).catch(function(){});return}
-    function sel(){prev.focus();prev.select();btn.textContent='Selecciónalo y cópialo'}
-    try{navigator.clipboard.writeText(t).then(function(){btn.textContent='Copiado ✓ · pégalo en WhatsApp';setTimeout(function(){btn.textContent='Exportar para WhatsApp'},2500)},sel)}catch(e){sel()}
+    var w=window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank','noopener');
+    if(!w){prev.focus();prev.select();this.textContent='Ventana bloqueada: copia el resumen de abajo'}
   });
   document.getElementById('descargar').addEventListener('click',function(){
-    var b=new Blob([resumen()],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
+    var b=new Blob([resumen(false)],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
     a.href=URL.createObjectURL(b);a.download='captacion-renta-'+(document.getElementById('fecha').value||'sin-fecha')+'.txt';
     document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
   });
