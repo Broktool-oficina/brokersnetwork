@@ -230,7 +230,7 @@ Te comparto también los requisitos de documentación para integrar el expedient
 <h2><span class="n">11</span>Exportar para WhatsApp</h2>
 <p>Genera un resumen con los datos de la visita y envíalo a tu asesor.</p>
 <div class="card">
-  <button class="copiar" type="button" id="exportar">Exportar para WhatsApp</button>
+  <a class="copiar" id="exportar" href="https://wa.me/" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">Exportar para WhatsApp</a>
   <button class="copiar" type="button" id="descargar" style="background:var(--azul);margin-left:8px">Descargar .txt</button>
   <label class="campo" style="margin-top:12px"><span>Vista previa del resumen (se actualiza sola mientras llenas la guía)</span><textarea id="resumen" readonly style="min-height:160px"></textarea></label>
 </div>
@@ -280,13 +280,7 @@ Te comparto también los requisitos de documentación para integrar el expedient
     L.push('*Observaciones:* '+(document.getElementById('obs').value.trim()||'—'));
     return L.join('\n');
   }
-  function refrescar(){var el=document.getElementById('resumen');if(el)el.value=resumen(true)}
-  document.getElementById('exportar').addEventListener('click',function(){
-    var t=resumen(true),prev=document.getElementById('resumen');
-    prev.value=t;
-    var w=window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank','noopener');
-    if(!w){prev.focus();prev.select();this.textContent='Ventana bloqueada: copia el resumen de abajo'}
-  });
+  function refrescar(){var t=resumen(true),el=document.getElementById('resumen'),a=document.getElementById('exportar');if(el)el.value=t;if(a)a.href='https://wa.me/?text='+encodeURIComponent(t)}
   document.getElementById('descargar').addEventListener('click',function(){
     var b=new Blob([resumen(false)],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
     a.href=URL.createObjectURL(b);a.download='captacion-renta-'+(document.getElementById('fecha').value||'sin-fecha')+'.txt';
