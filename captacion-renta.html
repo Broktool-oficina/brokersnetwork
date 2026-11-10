@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proceso 01 · Captación en renta</title>
+<style>
+:root{--azul:#1F3A5F;--naranja:#E0703A;--gris:#5B6672;--linea:#E3E8EE;--fondo:#F7F9FB}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#1B2530;background:#fff;line-height:1.5}
+.wrap{max-width:820px;margin:0 auto;padding:24px 18px 60px}
+header.portada{border-top:8px solid var(--naranja);border-radius:18px;padding:28px 24px;background:linear-gradient(135deg,var(--azul),#2C5282);color:#fff;margin-bottom:24px}
+.logo-slot{height:44px;border:1.5px dashed rgba(255,255,255,.6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;opacity:.85;width:200px;margin-bottom:16px}
+header.portada small{letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#FFC9A8}
+header.portada h1{margin:6px 0 4px;font-size:26px;line-height:1.2}
+header.portada p{margin:0;opacity:.92}
+h2{color:var(--azul);font-size:20px;margin:32px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--naranja);display:flex;gap:10px;align-items:center}
+h2 .n{background:var(--naranja);color:#fff;border-radius:50%;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+h3{color:var(--azul);font-size:16px;margin:18px 0 6px}
+p,li{font-size:15px}
+.card{background:var(--fondo);border:1px solid var(--linea);border-radius:14px;padding:14px 16px;margin:10px 0}
+.check{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--linea);cursor:pointer}
+.check:last-child{border-bottom:0}
+.check input{margin-top:4px;width:18px;height:18px;accent-color:var(--naranja);flex:none}
+.check span{font-size:15px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--linea);vertical-align:top}
+th{background:var(--azul);color:#fff;font-weight:600}
+td.ok{width:70px;text-align:center}
+td.ok input{width:18px;height:18px;accent-color:var(--naranja)}
+.tip{background:#FFF4EC;border-left:4px solid var(--naranja);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:14.5px}
+.tip b{color:#A8481B}
+.flujo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0}
+.flujo span{background:var(--azul);color:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;letter-spacing:.03em}
+.flujo i{color:var(--naranja);font-style:normal;font-weight:800}
+.msg{background:#fff;border:2px solid var(--azul);border-radius:14px;padding:16px;white-space:pre-wrap;font-size:15px}
+button.copiar{margin-top:10px;background:var(--naranja);color:#fff;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:14px}
+button.copiar:active{transform:translateY(1px)}
+.campo{display:block;margin:8px 0;font-size:14.5px}
+.campo span{display:block;color:var(--gris);font-size:13px;margin-bottom:3px}
+.campo input,.campo textarea{width:100%;border:1.5px solid var(--linea);border-radius:10px;padding:9px 11px;font:inherit}
+.campo textarea{min-height:70px}
+.progreso{position:sticky;top:0;background:#fff;padding:10px 0;z-index:2;border-bottom:1px solid var(--linea)}
+.barra{height:10px;background:var(--linea);border-radius:999px;overflow:hidden}
+.barra div{height:100%;width:0;background:linear-gradient(90deg,var(--naranja),#F2A35E);transition:width .2s}
+.prog-txt{font-size:13px;color:var(--gris);margin-top:4px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.reset{background:none;border:0;color:var(--azul);text-decoration:underline;cursor:pointer;font-size:13px;padding:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pie{margin-top:32px;font-size:12.5px;color:var(--gris)}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}header.portada h1{font-size:22px}}
+@media print{.progreso,button,.reset{display:none!important}body{font-size:12px}.wrap{padding:0}h2{break-after:avoid}.card,.tip,.msg{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="portada">
+  <div class="logo-slot">[Logo oficial de Brokers Network]</div>
+  <small>Brokers Network · Proceso 01</small>
+  <h1>Captación de propiedad en renta</h1>
+  <p>Guía práctica para tu primera visita. Úsala durante la visita como checklist.</p>
+</header>
+
+<div class="progreso" aria-live="polite">
+  <div class="barra"><div id="barra"></div></div>
+  <div class="prog-txt"><span id="progTxt">0 de 0 completados</span><button class="reset" type="button" id="reset">Reiniciar checklist</button></div>
+</div>
+
+<div class="grid2" style="margin-top:14px">
+  <label class="campo"><span>Nombre del broker</span><input type="text" id="nombre" placeholder="Fedora …"></label>
+  <label class="campo"><span>Fecha de la visita</span><input type="date" id="fecha"></label>
+  <label class="campo" style="grid-column:1/-1"><span>Dirección del inmueble</span><input type="text" id="direccion"></label>
+  <label class="campo" style="grid-column:1/-1"><span>Nombre de quien atiende al propietario</span><input type="text" id="contacto"></label>
+</div>
+
+<h2><span class="n">1</span>Objetivo de la visita</h2>
+<p>La primera visita sirve para:</p>
+<div class="card">
+  <label class="check"><input type="checkbox" data-k="obj"><span>Conocer el inmueble.</span></label>
+  <label class="check"><input type="checkbox" data-k="obj"><span>Generar confianza con el propietario.</span></label>
+  <label class="check"><input type="checkbox" data-k="obj"><span>Recopilar información comercial.</span></label>
+  <label class="check"><input type="checkbox" data-k="obj"><span>Obtener fotografías y video.</span></label>
+  <label class="check"><input type="checkbox" data-k="obj"><span>Solicitar la documentación del arrendador.</span></label>
+  <label class="check"><input type="checkbox" data-k="obj"><span>Confirmar las condiciones de comercialización.</span></label>
+</div>
+
+<h2><span class="n">2</span>Antes de la visita</h2>
+<div class="card">
+  <label class="check"><input type="checkbox" data-k="prev"><span>Confirmé dirección y horario con el propietario.</span></label>
+  <label class="check"><input type="checkbox" data-k="prev"><span>Revisé la información que ya tenemos del inmueble.</span></label>
+  <label class="check"><input type="checkbox" data-k="prev"><span>Mi celular tiene batería y espacio para fotos y video.</span></label>
+  <label class="check"><input type="checkbox" data-k="prev"><span>Llevo esta guía impresa o abierta, y mis preguntas.</span></label>
+  <label class="check"><input type="checkbox" data-k="prev"><span>Llego puntual y con presentación profesional.</span></label>
+</div>
+
+<h2><span class="n">3</span>Atención al propietario</h2>
+<p>Preséntate, escucha con atención y toma notas. Pregunta lo siguiente y anota la respuesta:</p>
+<table>
+  <tr><th>Pregunta</th><th>Respuesta</th><th>✔</th></tr>
+  <tr><td>Precio de renta</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>¿El mantenimiento va incluido o es adicional?</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>Disponibilidad</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>Depósito y garantías</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>Plazo mínimo de renta</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>¿Se permiten mascotas?</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>Número de ocupantes permitidos</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>Servicios incluidos</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>¿Cómo prefiere coordinar las visitas?</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>¿Quién acredita la propiedad y firma el contrato?</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+</table>
+<div class="tip"><b>Antes de tomar fotos o grabar:</b> pide autorización al propietario para fotografiar, grabar y comercializar el inmueble.</div>
+<label class="check"><input type="checkbox" data-k="prev"><span>Pedí autorización para fotos, video y comercialización.</span></label>
+
+<h2><span class="n">4</span>Levantamiento fotográfico</h2>
+<div class="card">
+  <label class="check"><input type="checkbox" data-k="foto"><span>Fachada y acceso</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Sala</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Comedor</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Cocina</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Recámaras</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Baños</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Clósets y vestidores</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Área de lavado</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Cuarto de servicio</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Terraza o balcón</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Jardín</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Amenidades</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Estacionamientos</span></label>
+  <label class="check"><input type="checkbox" data-k="foto"><span>Vistas</span></label>
+</div>
+<h3>Cómo tomarlas</h3>
+<div class="card">
+  <label class="check"><input type="checkbox" data-k="tip"><span>Fotos en horizontal.</span></label>
+  <label class="check"><input type="checkbox" data-k="tip"><span>Aprovecha la luz natural: abre cortinas y enciende las luces.</span></label>
+  <label class="check"><input type="checkbox" data-k="tip"><span>Quita desorden y objetos personales antes de fotografiar.</span></label>
+  <label class="check"><input type="checkbox" data-k="tip"><span>Mantén el celular recto, sin inclinarlo.</span></label>
+  <label class="check"><input type="checkbox" data-k="tip"><span>Toma varios ángulos de cada espacio.</span></label>
+</div>
+
+<h2><span class="n">5</span>Video recorrido</h2>
+<div class="card">
+  <p style="margin:0 0 6px">Graba un recorrido continuo desde la entrada. Muestra la distribución, las recámaras, los detalles, las amenidades y las vistas.</p>
+  <label class="check"><input type="checkbox" data-k="video"><span>Empecé en la entrada y terminé en las vistas o la terraza.</span></label>
+  <label class="check"><input type="checkbox" data-k="video"><span>Me moví despacio, sin movimientos bruscos.</span></label>
+  <label class="check"><input type="checkbox" data-k="video"><span>Grabé en horizontal y con buena luz.</span></label>
+</div>
+
+<h2><span class="n">6</span>Documentación del arrendador</h2>
+<h3>Persona física</h3>
+<div class="card">
+  <label class="check"><input type="checkbox" data-k="docf"><span>Identificación oficial vigente</span></label>
+  <label class="check"><input type="checkbox" data-k="docf"><span>Comprobante de domicilio</span></label>
+  <label class="check"><input type="checkbox" data-k="docf"><span>Constancia de situación fiscal</span></label>
+  <label class="check"><input type="checkbox" data-k="docf"><span>Escritura del inmueble con sello del Registro Público de la Propiedad</span></label>
+  <label class="check"><input type="checkbox" data-k="docf"><span>Carátula del estado de cuenta</span></label>
+  <label class="check"><input type="checkbox" data-k="docf"><span>Constancia de no adeudo de mantenimiento (si aplica)</span></label>
+  <label class="check"><input type="checkbox" data-k="docf"><span>Firma de enterado del Aviso de Privacidad</span></label>
+</div>
+<h3>Persona moral</h3>
+<div class="card">
+  <label class="check"><input type="checkbox" data-k="docm"><span>Acta constitutiva</span></label>
+  <label class="check"><input type="checkbox" data-k="docm"><span>Poder del representante legal</span></label>
+  <label class="check"><input type="checkbox" data-k="docm"><span>Identificación oficial del representante legal</span></label>
+  <label class="check"><input type="checkbox" data-k="docm"><span>Comprobante de domicilio</span></label>
+  <label class="check"><input type="checkbox" data-k="docm"><span>Carátula del estado de cuenta</span></label>
+  <label class="check"><input type="checkbox" data-k="docm"><span>Constancia de situación fiscal</span></label>
+  <label class="check"><input type="checkbox" data-k="docm"><span>Constancia de no adeudo de mantenimiento (si aplica)</span></label>
+  <label class="check"><input type="checkbox" data-k="docm"><span>Firma de enterado del Aviso de Privacidad</span></label>
+</div>
+<div class="tip"><b>Si quien entrega el inmueble no es el propietario:</b> pide el documento que acredite sus facultades de representación. Identifica también a los copropietarios y las autorizaciones que necesiten.</div>
+
+<h2><span class="n">7</span>Cierre de la visita</h2>
+<div class="card">
+  <label class="check"><input type="checkbox" data-k="cierre"><span>Información comercial completa</span></label>
+  <label class="check"><input type="checkbox" data-k="cierre"><span>Fotografías realizadas</span></label>
+  <label class="check"><input type="checkbox" data-k="cierre"><span>Video realizado</span></label>
+  <label class="check"><input type="checkbox" data-k="cierre"><span>Datos del propietario</span></label>
+  <label class="check"><input type="checkbox" data-k="cierre"><span>Documentación solicitada</span></label>
+  <label class="check"><input type="checkbox" data-k="cierre"><span>Documentación recibida o pendiente identificada</span></label>
+  <label class="check"><input type="checkbox" data-k="cierre"><span>Autorización de comercialización confirmada</span></label>
+  <label class="check"><input type="checkbox" data-k="cierre"><span>Condiciones de comisión y acuerdo comercial</span></label>
+</div>
+<label class="campo"><span>Observaciones adicionales</span><textarea id="obs"></textarea></label>
+
+<h2><span class="n">8</span>Mensaje de seguimiento al propietario</h2>
+<p>Cópialo y envíalo después de la visita:</p>
+<div class="msg" id="msg">¡Muchas gracias por recibirme y por la oportunidad de apoyarte con la renta de tu propiedad! 😊
+
+Estaré integrando la información, fotografías y video para preparar una presentación comercial del inmueble.
+
+Te comparto también los requisitos de documentación para integrar el expediente del arrendador. En cuanto tengamos todo completo y confirmadas las condiciones de comercialización, podremos avanzar con su promoción y atención a posibles interesados.
+
+¡Gracias por tu confianza!</div>
+<button class="copiar" type="button" id="copiar">Copiar mensaje</button>
+
+<h2><span class="n">9</span>Próximos pasos</h2>
+<div class="flujo">
+  <span>VISITA</span><i>→</i><span>RECOPILACIÓN DE INFORMACIÓN</span><i>→</i><span>DOCUMENTACIÓN</span><i>→</i><span>VALIDACIÓN</span><i>→</i><span>AUTORIZACIÓN COMERCIAL</span><i>→</i><span>PUBLICACIÓN</span>
+</div>
+<div class="tip"><b>Importante:</b> no publiques ni ofrezcas formalmente el inmueble hasta tener la información y las autorizaciones necesarias.</div>
+
+<div class="card" style="margin-top:24px">
+  <p style="margin:0"><b>Brokers Network</b> · Proceso 01: Captación de propiedad en renta</p>
+  <p style="margin:6px 0 0;font-size:13.5px;color:var(--gris)">Fecha: ________________ &nbsp;&nbsp; Nombre del broker: ________________________________</p>
+</div>
+
+<p class="pie">Guía de uso interno para nuevos brokers. Si tienes dudas durante la visita, escribe a tu equipo antes de avanzar.</p>
+</div>
+
+<script>
+(function(){
+  var KEY='captacion-renta-v1';
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox]'));
+  var campos=[].slice.call(document.querySelectorAll('input[type=text],input[type=date],textarea'));
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
+  function save(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
+  var d=load();
+  boxes.forEach(function(b,i){var id='c'+i;b.dataset.id=id;if(d[id])b.checked=true;b.addEventListener('change',function(){d[id]=b.checked;save(d);prog()})});
+  campos.forEach(function(c,i){var id='t'+i;c.dataset.id=id;if(d[id]!=null)c.value=d[id];c.addEventListener('input',function(){d[id]=c.value;save(d)})});
+  function prog(){var n=boxes.length,ok=boxes.filter(function(b){return b.checked}).length;document.getElementById('barra').style.width=(n?Math.round(ok/n*100):0)+'%';document.getElementById('progTxt').textContent=ok+' de '+n+' completados'}
+  document.getElementById('reset').addEventListener('click',function(){if(!confirm('¿Reiniciar todo el checklist?'))return;boxes.forEach(function(b){b.checked=false});campos.forEach(function(c){c.value=''});d={};save(d);prog()});
+  document.getElementById('copiar').addEventListener('click',function(){var t=document.getElementById('msg').textContent,btn=this;
+    function ok(){btn.textContent='Copiado ✓';setTimeout(function(){btn.textContent='Copiar mensaje'},2000)}
+    function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById('msg'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selecciónalo y cópialo'}
+    try{navigator.clipboard.writeText(t).then(ok,sel)}catch(e){sel()}});
+  prog();
+})();
+</script>
+</body>
+</html>
