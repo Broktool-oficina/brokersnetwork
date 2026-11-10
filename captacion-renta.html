@@ -114,7 +114,7 @@ button.copiar:active{transform:translateY(1px)}
   <tr><td>¿El mantenimiento va incluido o es adicional?</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
   <tr><td>Disponibilidad</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
   <tr><td>Depósito y garantías</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
-  <tr><td>Tipo de garantía o aval que se pide (depósito, fianza, aval, seguro de renta, otro)</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
+  <tr><td>Tipo de garantía o aval que se pide (puedes elegir varias)</td><td><label style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0"><input type="checkbox" class="gar noprog" value="Obligado solidario"> Obligado solidario</label><label style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0"><input type="checkbox" class="gar noprog" value="Aval con bien raíz"> Aval con bien raíz</label><label style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0"><input type="checkbox" class="gar noprog" value="Póliza jurídica"> Póliza jurídica</label><label style="display:inline-flex;align-items:center;gap:5px;margin:3px 10px 3px 0"><input type="checkbox" class="gar noprog" value="Mediación"> Mediación</label><input type="text" class="gar-otro noprog" placeholder="Otra (escríbela)" style="width:100%;margin-top:6px"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
   <tr><td>Plazo mínimo de renta</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
   <tr><td>¿Se permiten mascotas?</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
   <tr><td>Número de ocupantes permitidos</td><td><input type="text" style="width:100%"></td><td class="ok"><input type="checkbox" data-k="preg"></td></tr>
@@ -248,15 +248,19 @@ Te comparto también los requisitos de documentación para integrar el expedient
 <script>
 (function(){
   var KEY='captacion-renta-v1';
-  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox]'));
-  var campos=[].slice.call(document.querySelectorAll('input[type=text],input[type=date],textarea'));
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox]:not(.noprog)'));
+  var campos=[].slice.call(document.querySelectorAll('input[type=text]:not(.noprog),input[type=date],textarea'));
+  var gar=[].slice.call(document.querySelectorAll('input.gar')),otro=document.querySelector('.gar-otro');
   function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
   function save(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
   var d=load();
+  gar.forEach(function(g){if(d.gar&&d.gar.indexOf(g.value)>-1)g.checked=true;g.addEventListener('change',function(){d.gar=gar.filter(function(x){return x.checked}).map(function(x){return x.value});save(d);refrescar()})});
+  if(d.garOtro)otro.value=d.garOtro;
+  otro.addEventListener('input',function(){d.garOtro=otro.value;save(d);refrescar()});
   boxes.forEach(function(b,i){var id='c'+i;b.dataset.id=id;if(d[id])b.checked=true;b.addEventListener('change',function(){d[id]=b.checked;save(d);prog()})});
   campos.forEach(function(c,i){var id='t'+i;c.dataset.id=id;if(d[id]!=null)c.value=d[id];c.addEventListener('input',function(){d[id]=c.value;save(d);refrescar()})});
   function prog(){var n=boxes.length,ok=boxes.filter(function(b){return b.checked}).length;document.getElementById('barra').style.width=(n?Math.round(ok/n*100):0)+'%';document.getElementById('progTxt').textContent=ok+' de '+n+' completados';refrescar()}
-  document.getElementById('reset').addEventListener('click',function(){if(!confirm('¿Reiniciar todo el checklist?'))return;boxes.forEach(function(b){b.checked=false});campos.forEach(function(c){c.value=''});d={};save(d);prog()});
+  document.getElementById('reset').addEventListener('click',function(){if(!confirm('¿Reiniciar todo el checklist?'))return;boxes.forEach(function(b){b.checked=false});campos.forEach(function(c){c.value=''});gar.forEach(function(g){g.checked=false});otro.value='';d={};save(d);prog()});
   document.getElementById('copiar').addEventListener('click',function(){var t=document.getElementById('msg').textContent,btn=this;
     function ok(){btn.textContent='Copiado ✓';setTimeout(function(){btn.textContent='Copiar mensaje'},2000)}
     function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById('msg'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selecciónalo y cópialo'}
@@ -267,8 +271,9 @@ Te comparto también los requisitos de documentación para integrar el expedient
     L.push('*Respuestas del propietario*');
     [].forEach.call(document.querySelectorAll('table tr'),function(tr){
       var td=tr.querySelectorAll('td');if(td.length<2)return;
-      var inp=td[1].querySelector('input');
-      L.push('- '+td[0].textContent.trim()+': '+((inp&&inp.value.trim())||'—'));
+      var inp=td[1].querySelector('input');var resp=(inp&&inp.value.trim())||'—';
+      if(td[0].textContent.indexOf('Tipo de garantía')===0){var sel=gar.filter(function(c){return c.checked}).map(function(c){return c.value});if(otro.value.trim())sel.push(otro.value.trim());resp=sel.join(', ')||'—'}
+      L.push('- '+td[0].textContent.trim()+': '+resp);
     });
     L.push('');
     var ok=boxes.filter(function(b){return b.checked}).length;
