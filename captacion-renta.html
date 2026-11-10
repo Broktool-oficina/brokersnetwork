@@ -232,7 +232,7 @@ Te comparto también los requisitos de documentación para integrar el expedient
 <div class="card">
   <a class="copiar" id="exportar" href="https://wa.me/" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">Exportar para WhatsApp</a>
   <button class="copiar" type="button" id="descargar" style="background:var(--azul);margin-left:8px">Descargar .txt</button>
-  <label class="campo" style="margin-top:12px"><span>Vista previa del resumen (se actualiza sola mientras llenas la guía)</span><textarea id="resumen" readonly style="min-height:160px"></textarea></label>
+  <label class="campo" style="margin-top:12px"><span>Resumen completo (se actualiza sola mientras llenas la guía)</span><textarea id="resumen" readonly style="min-height:160px"></textarea></label>
 </div>
 
 <div class="card" style="margin-top:24px">
@@ -280,7 +280,7 @@ Te comparto también los requisitos de documentación para integrar el expedient
     L.push('*Observaciones:* '+(document.getElementById('obs').value.trim()||'—'));
     return L.join('\n');
   }
-  function refrescar(){var t=resumen(true),el=document.getElementById('resumen'),a=document.getElementById('exportar');if(el)el.value=t;if(a)a.href='https://wa.me/?text='+encodeURIComponent(t)}
+  function refrescar(){var t=resumen(false),el=document.getElementById('resumen'),a=document.getElementById('exportar');if(el)el.value=t;if(a)a.href='https://wa.me/?text='+encodeURIComponent(t)}
   document.getElementById('descargar').addEventListener('click',function(){
     var b=new Blob([resumen(false)],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
     a.href=URL.createObjectURL(b);a.download='captacion-renta-'+(document.getElementById('fecha').value||'sin-fecha')+'.txt';
