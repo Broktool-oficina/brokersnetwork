@@ -117,6 +117,7 @@ textarea.campo{min-height:80px;resize:vertical}
 
 <main class="wrap">
   <p class="aviso" id="aviso"></p>
+  <nav class="chips" id="tabs" aria-label="Proceso" style="margin-bottom:8px"><button type="button" class="chip" style="--st:#30445A" data-tab="interesados" aria-pressed="true">Interesados</button><button type="button" class="chip" style="--st:#1F6E49" data-tab="afiliados" aria-pressed="false">Afiliados</button></nav>
   <nav class="chips" id="chips" aria-label="Filtrar por etapa"></nav>
   <div class="bar"><input class="campo" id="q" type="search" placeholder="Buscar por nombre, celular, ciudad…" aria-label="Buscar"></div>
   <div class="list" id="list"><p class="vacio">Cargando…</p></div>
@@ -178,8 +179,10 @@ textarea.campo{min-height:80px;resize:vertical}
   function use(n){return window.claude&&window.claude.use?window.claude.use(n):Promise.resolve(null)}
 
   // Etapas en orden del proceso (avanzar/regresar) y color de cada una
-  var ESTADOS=[["nuevo","Interesado","#E7EDF3","#30445A"],["contactado","Contactado","#FFF4E5","#8A4B00"],["entrevista","Entrevista agendada","#EAF0FD","#2A50A8"],["documentos","Documentos","#F3E8FF","#6B2FA0"],["acceso","Acceso a chats y plataforma","#E9F7F4","#0F6B5E"],["demo","Demo Broktool","#FFF6E0","#8A6D00"],["materiales","Materiales","#EEF2FF","#3949AB"],["convenio","Convenio","#FFF1EC","#B8401F"],["pago","Pago / activación","#E6F4FA","#0E6A8C"],["afiliado","Afiliado","#E8F6EE","#1F6E49"],["descartado","Descartado","#F1F1F1","#777"]];
-  var FLUJO=["nuevo","contactado","entrevista","convenio","pago","afiliado","acceso","demo","materiales"];
+  var ESTADOS=[["nuevo","Interesado","#E7EDF3","#30445A"],["contactado","Contactado","#FFF4E5","#8A4B00"],["registro","Registro","#E4F3FB","#0B5C86"],["entrevista","Entrevista agendada","#EAF0FD","#2A50A8"],["documentos","Documentos","#F3E8FF","#6B2FA0"],["acceso","Acceso a chats y plataforma","#E9F7F4","#0F6B5E"],["demo","Demo Broktool","#FFF6E0","#8A6D00"],["materiales","Materiales","#EEF2FF","#3949AB"],["convenio","Convenio","#FFF1EC","#B8401F"],["pago","Pago / activación","#E6F4FA","#0E6A8C"],["afiliado","Afiliado","#E8F6EE","#1F6E49"],["descartado","Descartado","#F1F1F1","#777"]];
+  var FLUJO=["nuevo","contactado","registro","entrevista","pago","convenio","afiliado","acceso","demo","materiales"];
+  var TABS={interesados:["nuevo","contactado","registro","entrevista"],afiliados:["pago","convenio","afiliado","acceso","demo","materiales"]};
+  var TAB="interesados";
   var EST={};ESTADOS.forEach(function(e){EST[e[0]]=e});
   function label(k){return (EST[k]||EST.nuevo)[1]}
   function etapa(r){var k=r.estado==="documentos"?"convenio":r.estado;return k&&EST[k]?k:"nuevo"}
@@ -202,7 +205,8 @@ textarea.campo{min-height:80px;resize:vertical}
   function saludo(r){var p=String(r.nombre||"").trim().split(/\s+/)[0];return "Hola"+(p?" "+p:"")+"! "}
   var PLANT={
     nuevo:function(r){return saludo(r)+"👋\n\n"+PROCESO},
-    contactado:function(r){return saludo(r)+"👋 Gracias por tu interés en Brokers Network. Antes de agendar tu entrevista, te pedimos llenar tu registro aquí:\n🔗 https://www.brokersnetwork.mx/registro.html\n\n¿Te parece si después agendamos tu entrevista? Nos encantaría conocerte, explicarte nuestro modelo de colaboración y resolver tus dudas. ¿Qué día y horario te acomoda mejor? 🗓️"},
+    contactado:function(r){return saludo(r)+"👋 Gracias por tu interés en Brokers Network. ¿Te parece si agendamos tu entrevista? Nos encantaría conocerte, explicarte nuestro modelo de colaboración y resolver tus dudas. ¿Qué día y horario te acomoda mejor? 🗓️"},
+    registro:function(r){return saludo(r)+"📝 Para avanzar, completa tu registro en esta liga. Ahí mismo puedes ver los beneficios de la membresía y sus costos:\n🔗 https://www.brokersnetwork.mx/registro.html"},
     entrevista:function(r){return saludo(r)+"🤝 Te compartimos nuestro convenio de afiliación para que lo revises con calma. Puedes dejar tus dudas o comentarios directamente en el documento:\n🔗 "+LIGA_CONVENIO},
     documentos:function(r){return saludo(r)+"👋 ¿Tienes alguna duda o comentario sobre el convenio? Puedes dejarlo directamente en el documento para aclararlo antes de formalizar tu incorporación:\n🔗 "+LIGA_CONVENIO},
     convenio:function(r){return saludo(r)+"🎉 Te compartimos la liga de pago para elegir y activar tu membresía:\n🔗 [pega aquí la liga de pago]\n\nUna vez confirmado el pago, continuaremos con tu incorporación a Brokers Network y te compartiremos los accesos y recursos correspondientes."},
@@ -234,13 +238,14 @@ textarea.campo{min-height:80px;resize:vertical}
 
   function visible(r){
     var e=etapa(r);
-    if(filtro==="activos")return e!=="descartado";
+    if(filtro==="activos")return TABS[TAB].indexOf(e)>=0;
+    if(filtro==="descartado")return e==="descartado";
     return e===filtro;
   }
   function renderChips(){
     var c=$('chips');
-    var opts=[["activos","Activos",rows.filter(function(r){return etapa(r)!=="descartado"}).length,"#30445A"]]
-      .concat(FLUJO.map(function(k){return [k,label(k),rows.filter(function(r){return etapa(r)===k}).length,EST[k][3]]}))
+    var opts=[["activos","Activos",rows.filter(function(r){return TABS[TAB].indexOf(etapa(r))>=0}).length,"#30445A"]]
+      .concat(TABS[TAB].map(function(k){return [k,label(k),rows.filter(function(r){return etapa(r)===k}).length,EST[k][3]]}))
       .concat([["descartado","Descartados",rows.filter(function(r){return etapa(r)==="descartado"}).length,EST.descartado[3]]]);
     c.innerHTML=opts.map(function(o){return '<button type="button" class="chip" style="--st:'+o[3]+'" data-f="'+o[0]+'" aria-pressed="'+(filtro===o[0])+'">'+(o[0]==="activos"?"":'<i aria-hidden="true"></i>')+esc(o[1])+' <span class="n">'+o[2]+'</span></button>'}).join("");
   }
@@ -421,6 +426,7 @@ textarea.campo{min-height:80px;resize:vertical}
   $('imp').onclick=function(){$('impFile').click()};
   $('impFile').onchange=function(){var f=this.files&&this.files[0];this.value="";if(f)importar(f)};
 
+  $('tabs').addEventListener('click',function(e){var b=e.target.closest('[data-tab]');if(!b)return;TAB=b.dataset.tab;filtro='activos';document.querySelectorAll('#tabs [data-tab]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});render()});
   $('chips').addEventListener('click',function(e){var b=e.target.closest('[data-f]');if(!b)return;filtro=b.dataset.f;render()});
 
   use('db').then(function(d){
