@@ -163,6 +163,7 @@ button.copiar:active{transform:translateY(1px)}
 </div>
 
 <h2><span class="n">6</span>Documentación del arrendador</h2>
+<div class="tip"><b>Uso de los documentos:</b> se solicitan únicamente para verificar la propiedad del inmueble y poder firmar el contrato de arrendamiento.</div>
 <h3>Persona física</h3>
 <div class="card">
   <label class="check"><input type="checkbox" data-k="docf"><span>Identificación oficial vigente</span></label>
@@ -186,13 +187,13 @@ button.copiar:active{transform:translateY(1px)}
 </div>
 <h3>Aviso de privacidad (modelo base)</h3>
 <div class="tip"><b>Antes de usarlo:</b> reemplaza los datos entre corchetes y que el área jurídica revise el texto. Este modelo es una base, no una versión legal aprobada.</div>
-<div class="msg" style="font-size:14px">AVISO DE PRIVACIDAD SIMPLIFICADO
+<div class="msg" id="aviso" style="font-size:14px">AVISO DE PRIVACIDAD SIMPLIFICADO
 
 [Razón social del responsable], con domicilio en [domicilio], es responsable del uso y protección de sus datos personales.
 
 Datos que recabamos: nombre, identificación oficial, domicilio, teléfono, correo electrónico, RFC, datos del inmueble y, según el tipo de contrato, datos de su estado de cuenta.
 
-Finalidades necesarias: integrar su expediente, verificar su identidad, acreditar la propiedad del inmueble y comercializarlo para su renta.
+Finalidades necesarias: verificar la propiedad del inmueble y poder firmar el contrato de arrendamiento. Los documentos que le solicitamos se usan únicamente para estos fines.
 
 Finalidades no necesarias: [describir, por ejemplo, envío de información sobre otros servicios]. Si no desea que sus datos se usen para estas finalidades, marque la casilla de abajo.
 
@@ -201,6 +202,7 @@ Transferencias: sus datos podrán compartirse con personas interesadas en rentar
 Derechos ARCO: usted puede acceder, rectificar, cancelar u oponerse al tratamiento de sus datos, o revocar su consentimiento, escribiendo a [correo de contacto].
 
 Cambios: este aviso puede modificarse. La versión vigente estará disponible en [liga].</div>
+<button class="copiar" type="button" id="descargarAviso">Descargar aviso (.txt)</button>
 <div class="card" style="margin-top:8px">
   <label class="check"><input type="checkbox" data-k="priv"><span>Le expliqué el aviso de privacidad y firmó de enterado.</span></label>
   <label class="check"><input type="checkbox" data-k="priv"><span>Marcó si no acepta las finalidades no necesarias.</span></label>
@@ -313,6 +315,11 @@ Te comparto también los requisitos de documentación para integrar el expedient
   document.getElementById('descargar').addEventListener('click',function(){
     var b=new Blob([resumen(false)],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
     a.href=URL.createObjectURL(b);a.download='captacion-renta-'+(document.getElementById('fecha').value||'sin-fecha')+'.txt';
+    document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+  });
+  document.getElementById('descargarAviso').addEventListener('click',function(){
+    var b=new Blob([document.getElementById('aviso').textContent],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(b);a.download='aviso-de-privacidad.txt';
     document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
   });
   prog();
