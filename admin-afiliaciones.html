@@ -111,8 +111,8 @@ textarea.campo{min-height:80px;resize:vertical}
 </style>
 
 <header class="top">
-  <div><h1>Tracker de afiliaciones</h1><small>Brokers Network · interesados en afiliarse</small></div>
-  <div class="hacts"><button class="btn nar" id="nuevo" type="button">+ Agregar interesado</button><button class="btn lin" id="imp" type="button">Importar Excel</button><button class="btn lin" id="csv" type="button">Descargar CSV</button><input type="file" id="impFile" accept=".xlsx,.xls,.csv" hidden></div>
+  <div><h1>Tracker de afiliados</h1><small>Brokers Network · del interés a la afiliación, en un solo proceso</small></div>
+  <div class="hacts"><button class="btn nar" id="nuevo" type="button">+ Agregar interesado</button><button class="btn lin" id="migr" type="button">Migrar afiliados antiguos</button><button class="btn lin" id="imp" type="button">Importar Excel</button><button class="btn lin" id="csv" type="button">Descargar CSV</button><input type="file" id="impFile" accept=".xlsx,.xls,.csv" hidden></div>
 </header>
 
 <main class="wrap">
@@ -141,6 +141,13 @@ textarea.campo{min-height:80px;resize:vertical}
       <label>Etapa<select class="campo" name="estado" id="fEstado"></select></label>
       <label>Fecha de entrevista<input class="campo" name="entrevista" type="date"></label>
       <label>Inmobiliaria<input class="campo" name="inmobiliaria"></label>
+    </div>
+    <div class="g2">
+      <label>Plan<input class="campo" name="plan"></label>
+      <label>Estado de afiliado<select class="campo" name="estadoAfiliado"><option value="activo">Activo</option><option value="pausado">Pausado</option><option value="baja">Baja</option></select></label>
+      <label>Alta<input class="campo" name="alta" type="date"></label>
+      <label>Vence<input class="campo" name="vence" type="date"></label>
+      <label>Convenio<input class="campo" name="convenio" placeholder="Firmado, pendiente…"></label>
     </div>
     <label>Notas<textarea class="campo" name="notas"></textarea></label>
     <label>Notas de la entrevista<textarea class="campo" name="notasEntrevista" placeholder="Qué platicaron, perfil, dudas, siguientes pasos…"></textarea></label>
@@ -178,7 +185,7 @@ textarea.campo{min-height:80px;resize:vertical}
   function etapa(r){return r.estado&&EST[r.estado]?r.estado:"nuevo"}
   function anterior(k){var i=FLUJO.indexOf(k);return i>0?FLUJO[i-1]:null}
   function siguiente(k){var i=FLUJO.indexOf(k);return i>=0&&i<FLUJO.length-1?FLUJO[i+1]:null}
-  var CAMPOS=['nombre','cel','correo','correoBN','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','notasEntrevista'];
+  var CAMPOS=['nombre','cel','correo','correoBN','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','notasEntrevista','plan','alta','vence','convenio','estadoAfiliado'];
 
   var WA_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.9 2.9 4.6 4 1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3Z"/></svg>';
 
@@ -241,6 +248,7 @@ textarea.campo{min-height:80px;resize:vertical}
       +'<div class="card-main">'
       +'<div class="card-top"><span class="who">'+esc(r.nombre||"(sin nombre)")+'</span><span class="pill">'+esc(label(e))+'</span></div>'
       +'<div class="meta">'+(meta?'<span>'+meta+'</span>':'')+(r.fuente?'<span>Nos conoció por: '+esc(r.fuente)+'</span>':'')+(r.entrevista?'<span>📅 Entrevista: '+esc(r.entrevista)+'</span>':'')+(r.inmobiliaria?'<span>🏢 '+esc(r.inmobiliaria)+'</span>':'')+'</div>'
+      +((r.plan||r.alta||r.vence||r.convenio||(e==='afiliado'&&r.estadoAfiliado&&r.estadoAfiliado!=='activo'))?'<div class="meta">'+(r.plan?'<span>🎫 '+esc(r.plan)+'</span>':'')+(r.alta?'<span>Alta: '+esc(r.alta)+'</span>':'')+(r.vence?'<span>Vence: '+esc(r.vence)+'</span>':'')+(r.convenio?'<span>📄 Convenio: '+esc(r.convenio)+'</span>':'')+(e==='afiliado'&&r.estadoAfiliado&&r.estadoAfiliado!=='activo'?'<span>⚠️ '+esc(r.estadoAfiliado)+'</span>':'')+'</div>':'')
       +(r.cel?'<a class="tel" target="_blank" rel="noopener" href="'+waHref(r.cel,"")+'">'+WA_SVG+'<span>'+esc(r.cel)+'</span></a>':'')
       +(r.correo||r.correoBN?'<div class="meta">'+(r.correoBN?'<span>🏢 '+esc(r.correoBN)+'</span>':'')+(r.correo?'<span>✉️ '+esc(r.correo)+'</span>':'')+'</div>':'')
       +(r.notas?'<p class="notas">'+esc(r.notas)+'</p>':'')
@@ -338,7 +346,7 @@ textarea.campo{min-height:80px;resize:vertical}
     if(act==='eliminar'){if(col&&confirm('¿Eliminar a '+(r.nombre||'este interesado')+'?'))col.doc(r.id).delete().catch(function(){aviso('No se pudo eliminar.')});return}
   });
 
-  $('csv').onclick=function(){var cols=['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','notasEntrevista','creado'];
+  $('csv').onclick=function(){var cols=['nombre','cel','correo','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','notasEntrevista','plan','alta','vence','convenio','estadoAfiliado','creado'];
     var csv=[cols.join(',')].concat(rows.map(function(r){return cols.map(function(k){var v=k==='estado'?label(etapa(r)):(r[k]||'');return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')})).join('\n');
     var blob=new Blob(['\ufeff'+csv],{type:'text/csv'});use('downloads').then(function(dl){if(dl)return dl.save({filename:'afiliaciones-bn.csv',data:blob});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='afiliaciones-bn.csv';a.click()}).catch(function(){})};
 
@@ -385,6 +393,27 @@ textarea.campo{min-height:80px;resize:vertical}
       });
     }).catch(function(err){aviso("No pude leer el archivo. Usa un Excel (.xlsx) o CSV con las columnas de la plantilla."+(err&&err.message==="red"?" (No se cargó la librería de Excel; revisa tu conexión.)":""))});
   }
+  function migrarAfiliados(){
+    if(!db){aviso('Inicia sesión en el panel admin para migrar.');return}
+    if(!confirm('¿Copiar los registros de afiliados antiguos a este tracker? Los originales no se borran.'))return;
+    var hecho=false,u=null;
+    function procesar(s){
+      var ya={};rows.forEach(function(r){if(r.migradoDe)ya[r.migradoDe]=true});
+      var nuevos=s.docs.filter(function(x){return !ya[x.id]}).map(function(x){
+        var o=x.data(),est=o.estado||'activo';
+        return {nombre:o.nombre||'',cel:o.cel||'',correo:o.correo||'',ciudad:o.ciudad||'',inmobiliaria:o.inmobiliaria||'',plan:o.plan||'',alta:o.alta||'',vence:o.vence||'',convenio:o.convenio||'',notas:o.notas||'',estado:est==='pendiente'?'convenio':'afiliado',estadoAfiliado:est,migradoDe:x.id,creado:o.creado||new Date().toISOString()};
+      });
+      if(!nuevos.length){toast('No hay registros nuevos por migrar.');return}
+      Promise.all(nuevos.map(function(d){return col.doc().set(d).then(function(){return 1},function(){return 0})})).then(function(res){
+        var ok=res.reduce(function(a,b){return a+b},0);
+        toast(ok+' afiliado'+(ok===1?'':'s')+' migrado'+(ok===1?'':'s')+'.');
+        if(ok<nuevos.length)aviso((nuevos.length-ok)+' no se pudieron migrar. Intenta de nuevo.');
+      });
+    }
+    u=db.collection('afiliados').orderBy('creado','desc').onSnapshot(function(s){if(hecho)return;hecho=true;if(u)u();procesar(s)});
+    if(hecho&&u)u();
+  }
+  $('migr').onclick=migrarAfiliados;
   $('imp').onclick=function(){$('impFile').click()};
   $('impFile').onchange=function(){var f=this.files&&this.files[0];this.value="";if(f)importar(f)};
 
