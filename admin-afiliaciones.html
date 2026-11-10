@@ -178,11 +178,11 @@ textarea.campo{min-height:80px;resize:vertical}
   function use(n){return window.claude&&window.claude.use?window.claude.use(n):Promise.resolve(null)}
 
   // Etapas en orden del proceso (avanzar/regresar) y color de cada una
-  var ESTADOS=[["nuevo","Nuevo","#E7EDF3","#30445A"],["contactado","Contactado","#FFF4E5","#8A4B00"],["entrevista","Entrevista agendada","#EAF0FD","#2A50A8"],["documentos","Documentos","#F3E8FF","#6B2FA0"],["convenio","Convenio","#FFF1EC","#B8401F"],["pago","Pago / activación","#E6F4FA","#0E6A8C"],["afiliado","Afiliado","#E8F6EE","#1F6E49"],["descartado","Descartado","#F1F1F1","#777"]];
-  var FLUJO=["nuevo","contactado","entrevista","documentos","convenio","pago","afiliado"];
+  var ESTADOS=[["nuevo","Interesado","#E7EDF3","#30445A"],["contactado","Contactado","#FFF4E5","#8A4B00"],["entrevista","Entrevista agendada","#EAF0FD","#2A50A8"],["documentos","Documentos","#F3E8FF","#6B2FA0"],["acceso","Acceso a chats y plataforma","#E9F7F4","#0F6B5E"],["demo","Demo Broktool","#FFF6E0","#8A6D00"],["materiales","Materiales","#EEF2FF","#3949AB"],["convenio","Convenio","#FFF1EC","#B8401F"],["pago","Pago / activación","#E6F4FA","#0E6A8C"],["afiliado","Afiliado","#E8F6EE","#1F6E49"],["descartado","Descartado","#F1F1F1","#777"]];
+  var FLUJO=["nuevo","contactado","entrevista","convenio","pago","afiliado","acceso","demo","materiales"];
   var EST={};ESTADOS.forEach(function(e){EST[e[0]]=e});
   function label(k){return (EST[k]||EST.nuevo)[1]}
-  function etapa(r){return r.estado&&EST[r.estado]?r.estado:"nuevo"}
+  function etapa(r){var k=r.estado==="documentos"?"convenio":r.estado;return k&&EST[k]?k:"nuevo"}
   function anterior(k){var i=FLUJO.indexOf(k);return i>0?FLUJO[i-1]:null}
   function siguiente(k){var i=FLUJO.indexOf(k);return i>=0&&i<FLUJO.length-1?FLUJO[i+1]:null}
   var CAMPOS=['nombre','cel','correo','correoBN','ciudad','perfil','experiencia','fuente','estado','entrevista','inmobiliaria','notas','notasEntrevista','plan','alta','vence','convenio','estadoAfiliado'];
@@ -207,7 +207,10 @@ textarea.campo{min-height:80px;resize:vertical}
     documentos:function(r){return saludo(r)+"👋 ¿Tienes alguna duda o comentario sobre el convenio? Puedes dejarlo directamente en el documento para aclararlo antes de formalizar tu incorporación:\n🔗 "+LIGA_CONVENIO},
     convenio:function(r){return saludo(r)+"🎉 Te compartimos la liga de pago para elegir y activar tu membresía:\n🔗 [pega aquí la liga de pago]\n\nUna vez confirmado el pago, continuaremos con tu incorporación a Brokers Network y te compartiremos los accesos y recursos correspondientes."},
     pago:function(r){return bienvenida(r)},
-    afiliado:function(r){return MATERIALES}
+    afiliado:function(r){return "[Texto pendiente: Afiliado]"},
+    acceso:function(r){return "[Texto pendiente: Acceso a chats y plataforma]"},
+    demo:function(r){return "[Texto pendiente: Demo Broktool]"},
+    materiales:function(r){return MATERIALES}
   };
   // Segundo mensaje de la etapa Afiliado: revisión de materiales y proveedores de impresión
   var MATERIALES=["REVISIÓN DE MATERIALES","","A continuación ponemos a tu disposición el diseño de tu perfil, lonas y tarjetas para tu revisión. Verifica con cuidado tus datos.","","Sugerimos agregar el logo a tu perfil de Whatsapp / Facebook para atraer clientes e interés de parte de tus familiares y conocidos.","","Todos los materiales están listos para impresión sin que sea necesaria revisión por parte de impresores.","","Te sugerimos los siguientes proveedores para impresión de tus materiales (comenta que eres parte de BN):","","LONAS Especificaciones sugeridas: Lona de 1x1.1m con dobladillo y ojillos","","1️⃣ Central Graphics","Enrique Vitte","Cel. 55 7812 6476","Costo $100 más envío","","2️⃣ Pop Creativo","Contacto: Bibiana Ortega","Cel. 55 2085 8938","Costo $100 más envío","","TARJETAS DE PRESENTACIÓN","","1️⃣ Central Graphics","Enrique Vitte","Cel. 55 7812 6476","Costo $350 más envío","","2️⃣ www.imprimir360.com.mx"].join("\n");
