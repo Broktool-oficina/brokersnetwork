@@ -177,6 +177,7 @@ button.copiar:active{transform:translateY(1px)}
 <h3>Persona moral</h3>
 <div class="card">
   <label class="check"><input type="checkbox" data-k="docm"><span>Acta constitutiva</span></label>
+  <label class="check"><input type="checkbox" data-k="docm"><span>Escritura del inmueble con sello del Registro Público de la Propiedad</span></label>
   <label class="check"><input type="checkbox" data-k="docm"><span>Poder del representante legal</span></label>
   <label class="check"><input type="checkbox" data-k="docm"><span>Identificación oficial del representante legal</span></label>
   <label class="check"><input type="checkbox" data-k="docm"><span>Comprobante de domicilio</span></label>
@@ -258,6 +259,8 @@ Te comparto también los requisitos de documentación para integrar el expedient
 <div class="card">
   <a class="copiar" id="exportar" href="https://wa.me/" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">Exportar para WhatsApp</a>
   <button class="copiar" type="button" id="descargar" style="background:var(--azul);margin-left:8px">Descargar .txt</button>
+  <button class="copiar" type="button" id="imprimir" style="background:var(--azul);margin-left:8px">Imprimir / guardar PDF</button>
+  <a class="copiar" href="captacion-renta.html" download="captacion-renta.html" style="display:inline-block;text-decoration:none;background:var(--azul);margin-left:8px;margin-top:10px">Descargar checklist (.html)</a>
   <label class="campo" style="margin-top:12px"><span>Resumen completo (se actualiza sola mientras llenas la guía)</span><textarea id="resumen" readonly style="min-height:160px"></textarea></label>
 </div>
 
@@ -322,6 +325,7 @@ Te comparto también los requisitos de documentación para integrar el expedient
     a.href=URL.createObjectURL(b);a.download='aviso-de-privacidad.txt';
     document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
   });
+  document.getElementById('imprimir').addEventListener('click',function(){window.print()});
   prog();
 })();
 </script>
