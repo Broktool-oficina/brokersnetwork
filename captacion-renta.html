@@ -74,6 +74,17 @@ button.copiar:active{transform:translateY(1px)}
   <label class="campo" style="grid-column:1/-1"><span>Nombre de quien atiende al propietario</span><input type="text" id="contacto"></label>
 </div>
 
+<div class="card" style="border-left:4px solid var(--azul)">
+  <b>Cómo usar esta guía</b>
+  <ol style="margin:8px 0 0;padding-left:20px;font-size:14.5px">
+    <li>Llena nombre, fecha, dirección y quién atiende al propietario.</li>
+    <li>Marca cada paso conforme lo hagas. La barra de arriba muestra tu avance.</li>
+    <li>En la sección 3, anota las respuestas del propietario en la tabla.</li>
+    <li>Al terminar la visita, ve a la sección 10 y toca <b>Exportar para WhatsApp</b> para enviárselo a tu asesor.</li>
+    <li>Tu avance se guarda solo en este celular. Si cambias de teléfono o borras los datos del navegador, exporta antes.</li>
+  </ol>
+</div>
+
 <h2><span class="n">1</span>Objetivo de la visita</h2>
 <p>La primera visita sirve para:</p>
 <div class="card">
@@ -200,6 +211,14 @@ Te comparto también los requisitos de documentación para integrar el expedient
 </div>
 <div class="tip"><b>Importante:</b> no publiques ni ofrezcas formalmente el inmueble hasta tener la información y las autorizaciones necesarias.</div>
 
+<h2><span class="n">10</span>Exportar para WhatsApp</h2>
+<p>Genera un resumen con los datos de la visita y envíalo a tu asesor.</p>
+<div class="card">
+  <button class="copiar" type="button" id="exportar">Exportar para WhatsApp</button>
+  <button class="copiar" type="button" id="descargar" style="background:var(--azul);margin-left:8px">Descargar .txt</button>
+  <label class="campo" style="margin-top:12px"><span>Vista previa del resumen</span><textarea id="resumen" readonly style="min-height:160px"></textarea></label>
+</div>
+
 <div class="card" style="margin-top:24px">
   <p style="margin:0"><b>Brokers Network</b> · Proceso 01: Captación de propiedad en renta</p>
   <p style="margin:6px 0 0;font-size:13.5px;color:var(--gris)">Fecha: ________________ &nbsp;&nbsp; Nombre del broker: ________________________________</p>
@@ -224,6 +243,39 @@ Te comparto también los requisitos de documentación para integrar el expedient
     function ok(){btn.textContent='Copiado ✓';setTimeout(function(){btn.textContent='Copiar mensaje'},2000)}
     function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById('msg'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selecciónalo y cópialo'}
     try{navigator.clipboard.writeText(t).then(ok,sel)}catch(e){sel()}});
+  function resumen(){
+    function v(id){return (document.getElementById(id).value||'').trim()||'—'}
+    var L=['*CHECKLIST · CAPTACIÓN EN RENTA (Proceso 01)*','Broker: '+v('nombre'),'Fecha: '+v('fecha'),'Dirección: '+v('direccion'),'Atiende: '+v('contacto'),''];
+    L.push('*Respuestas del propietario*');
+    [].forEach.call(document.querySelectorAll('table tr'),function(tr){
+      var td=tr.querySelectorAll('td');if(td.length<2)return;
+      var inp=td[1].querySelector('input');
+      L.push('- '+td[0].textContent.trim()+': '+((inp&&inp.value.trim())||'—'));
+    });
+    L.push('');
+    var ok=boxes.filter(function(b){return b.checked}).length;
+    L.push('*Avance:* '+ok+' de '+boxes.length+' pasos completados');
+    var pend=[];
+    [].forEach.call(document.querySelectorAll('.card label.check'),function(lb){
+      var cb=lb.querySelector('input');if(cb&&!cb.checked)pend.push(lb.textContent.trim());
+    });
+    if(pend.length){L.push('*Pendientes:*');pend.forEach(function(x){L.push('- '+x)})}
+    L.push('');
+    L.push('*Observaciones:* '+(document.getElementById('obs').value.trim()||'—'));
+    return L.join('\n');
+  }
+  document.getElementById('exportar').addEventListener('click',function(){
+    var t=resumen(),prev=document.getElementById('resumen'),btn=this;
+    prev.value=t;
+    if(navigator.share){navigator.share({text:t}).catch(function(){});return}
+    function sel(){prev.focus();prev.select();btn.textContent='Selecciónalo y cópialo'}
+    try{navigator.clipboard.writeText(t).then(function(){btn.textContent='Copiado ✓ · pégalo en WhatsApp';setTimeout(function(){btn.textContent='Exportar para WhatsApp'},2500)},sel)}catch(e){sel()}
+  });
+  document.getElementById('descargar').addEventListener('click',function(){
+    var b=new Blob([resumen()],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(b);a.download='captacion-renta-'+(document.getElementById('fecha').value||'sin-fecha')+'.txt';
+    document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+  });
   prog();
 })();
 </script>
