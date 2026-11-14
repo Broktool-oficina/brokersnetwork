@@ -112,7 +112,7 @@ textarea.campo{min-height:80px;resize:vertical}
 
 <header class="top">
   <div><h1>Tracker de afiliados</h1><small>Brokers Network · del interés a la afiliación, en un solo proceso</small></div>
-  <div class="hacts"><button class="btn nar" id="nuevo" type="button">+ Agregar interesado</button><button class="btn lin" id="migr" type="button">Migrar afiliados antiguos</button><button class="btn lin" id="imp" type="button">Importar Excel</button><button class="btn lin" id="csv" type="button">Descargar CSV</button><input type="file" id="impFile" accept=".xlsx,.xls,.csv" hidden></div>
+  <div class="hacts"><button class="btn nar" id="nuevo" type="button">+ Agregar interesado</button><button class="btn lin" id="migr" type="button">Migrar afiliados antiguos</button><button class="btn lin" id="enlBtn" type="button">Enlaces de grupos</button><button class="btn lin" id="imp" type="button">Importar Excel</button><button class="btn lin" id="csv" type="button">Descargar CSV</button><input type="file" id="impFile" accept=".xlsx,.xls,.csv" hidden></div>
 </header>
 
 <main class="wrap">
@@ -174,10 +174,24 @@ textarea.campo{min-height:80px;resize:vertical}
 <div class="toast" id="toast" hidden></div>
 <footer class="vers" id="vers">Versión 2026.11.09.4 · tracker de afiliados</footer>
 
+<dialog id="enlDlg" style="border:1px solid var(--linea);border-radius:14px;max-width:560px;width:92vw;padding:16px">
+  <form method="dialog" id="enlForm" style="display:flex;flex-direction:column;gap:8px">
+    <b>Enlaces de los grupos de WhatsApp</b>
+    <small style="color:var(--gris-m)">Pega el enlace de invitación de cada grupo (empieza con https://chat.whatsapp.com/). Se usa en el mensaje de bienvenida. Déjalo vacío si no hay.</small>
+    <div id="enlCampos" style="display:flex;flex-direction:column;gap:8px"></div>
+    <p class="aviso" id="enlAviso" style="display:none"></p>
+    <div class="acc" style="display:flex;gap:8px;justify-content:flex-end"><button class="btn lin" type="button" id="enlCancelar">Cancelar</button><button class="btn nar" type="submit" id="enlGuardar">Guardar</button></div>
+  </form>
+</dialog>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id)};
   function use(n){return window.claude&&window.claude.use?window.claude.use(n):Promise.resolve(null)}
+
+  /* Enlaces de grupos de WhatsApp: viven en la pestaña "links" de la hoja de Google, no en el código. */
+  var GRUPOS=[["bn_oficial","📢 BN Oficial"],["team_bn","🤝 Team BN"],["bn_sur","📍 BN Sur"],["bn_foraneos","🌎 BN Foráneos"],["estrategia_medios","📣 Estrategia de medios"],["capacitaciones","🎓 Capacitaciones"],["inversiones_usa","🇺🇸 Inversiones en USA"]];
+  var ENL={},lcol=null;
+  function L(k){var u=ENL[k];if(u)return u;var g=GRUPOS.filter(function(x){return x[0]===k})[0];return "[falta el enlace del grupo "+(g?g[1]:k)+"]"}
 
   // Etapas en orden del proceso (avanzar/regresar) y color de cada una
   var ESTADOS=[["nuevo","Interesado","#E7EDF3","#30445A"],["contactado","Contactado","#FFF4E5","#8A4B00"],["registro","Registro","#E4F3FB","#0B5C86"],["entrevista","Entrevista agendada","#EAF0FD","#2A50A8"],["documentos","Documentos","#F3E8FF","#6B2FA0"],["acceso","Acceso a chats y plataforma","#E9F7F4","#0F6B5E"],["demo","Demo Broktool","#FFF6E0","#8A6D00"],["materiales","Materiales","#EEF2FF","#3949AB"],["convenio","Convenio","#FFF1EC","#B8401F"],["pago","Pago / activación","#E6F4FA","#0E6A8C"],["afiliado","Afiliado","#E8F6EE","#1F6E49"],["inactivo","No activo","#FBEAEA","#9B2C2C"],["descartado","Descartado","#F1F1F1","#777"]];
@@ -200,7 +214,7 @@ textarea.campo{min-height:80px;resize:vertical}
     var p=String(r.nombre||"").trim().split(/\s+/)[0]||"[nombre]";
     var ci=r.correoBN||"[falta correo institucional]";
     var pe=r.correo||"[falta correo personal]";
-    return ["¡Hola, "+p+"! 😊🏡 ¡Bienvenida a Brokers Network!","","Te compartimos todos tus accesos y recursos para que puedas comenzar a trabajar con nuestra comunidad.","","📩 1. CORREO INSTITUCIONAL","","Tu correo de Brokers Network es:",ci,"","Los mensajes que recibas en esta cuenta se reenviarán a tu correo personal:",pe,"","📲 2. ACCESO A BROKTOOL","","Te llegará una invitación a nuestra plataforma 🌐Broktool a tu correo de BN:",ci,"","🌐 Plataforma web:","https://brokersnetwork.broktool.com/es","","🍎 App Store:","https://apps.apple.com/mx/app/broktool-network-inmobiliaria/id6746459085","","🤖 Google Play:","https://play.google.com/store/apps/details?id=com.broktool.app","","🤝 4. ACCESOS A LA COMUNIDAD BROKERS NETWORK","","Te invitamos a integrarte a nuestros grupos de WhatsApp para mantenerte al tanto de los comunicados, oportunidades de negocio, estrategias de medios y capacitaciones.","","📢 BN Oficial","https://chat.whatsapp.com/L0rTvnGFrB1GF8Uu5zBesx","","🤝 Team BN","https://chat.whatsapp.com/1Snwlsf4AAhDL8FUz6uaps","","📍 BN Sur","https://chat.whatsapp.com/HE0xSCwqWF8HTEivnbxCLL","","🌎 BN Foráneos","https://chat.whatsapp.com/CbRuKoeuM0a1rzaY9KK6t5","","📣 Estrategia de medios","https://chat.whatsapp.com/KrpKDQXzvuoIpqSBrmpTdB","","🎓 Capacitaciones","https://chat.whatsapp.com/LFp0RUPvgIJJ5qg8gKQcwV","","🇺🇸 Inversiones en USA","https://chat.whatsapp.com/GeiJwKjEqMpBX1j9UqUaPs?mode=gi_t","","📁 5. DRIVE DE BROKERS NETWORK","","Aquí encontrarás más de 60 formatos y documentos de apoyo para tu operación inmobiliaria.","","👉 https://drive.google.com/drive/folders/1CiAnmjbzBMe_0hbWo2f1hC8kyv7M6sQm","","🎨 6. MATERIAL PERSONALIZADO","","Te compartiremos tus materiales personalizados para WhatsApp y redes sociales, tarjetas de presentación y promoción de propiedades, según corresponda, la segunda semana de noviembre","","📲 7. ACCESO A BROKTOOL: RECOMENDACIONES","","Ingresa primero a la plataforma web con las credenciales indicadas y después descarga la aplicación móvil para iniciar sesión con los mismos datos.","","👀 Importante: Estamos trabajando en la mejora continua de nuestra plataforma web para ofrecerte una mejor experiencia. 🙌 Te pedimos un poquito de paciencia mientras seguimos haciendo ajustes. 🚀 Próximamente te compartiremos cómo reportar cualquier detalle a nuestro equipo de soporte para que podamos darle seguimiento. ¡Gracias por tu comprensión! 💚","","🎓 8. INDUCCIÓN INICIAL","","Te orientaremos sobre las herramientas, los formatos y las capacitaciones disponibles para que puedas aprovechar los beneficios de la red.","","¡Nos da mucho gusto tenerte en Brokers Network! Estamos listas para crecer y hacer negocios en equipo. 🏡🤝✨"].join("\n");
+    return ["¡Hola, "+p+"! 😊🏡 ¡Bienvenida a Brokers Network!","","Te compartimos todos tus accesos y recursos para que puedas comenzar a trabajar con nuestra comunidad.","","📩 1. CORREO INSTITUCIONAL","","Tu correo de Brokers Network es:",ci,"","Los mensajes que recibas en esta cuenta se reenviarán a tu correo personal:",pe,"","📲 2. ACCESO A BROKTOOL","","Te llegará una invitación a nuestra plataforma 🌐Broktool a tu correo de BN:",ci,"","🌐 Plataforma web:","https://brokersnetwork.broktool.com/es","","🍎 App Store:","https://apps.apple.com/mx/app/broktool-network-inmobiliaria/id6746459085","","🤖 Google Play:","https://play.google.com/store/apps/details?id=com.broktool.app","","🤝 4. ACCESOS A LA COMUNIDAD BROKERS NETWORK","","Te invitamos a integrarte a nuestros grupos de WhatsApp para mantenerte al tanto de los comunicados, oportunidades de negocio, estrategias de medios y capacitaciones.","","📢 BN Oficial",L("bn_oficial"),"","🤝 Team BN",L("team_bn"),"","📍 BN Sur",L("bn_sur"),"","🌎 BN Foráneos",L("bn_foraneos"),"","📣 Estrategia de medios",L("estrategia_medios"),"","🎓 Capacitaciones",L("capacitaciones"),"","🇺🇸 Inversiones en USA",L("inversiones_usa"),"","📁 5. DRIVE DE BROKERS NETWORK","","Aquí encontrarás más de 60 formatos y documentos de apoyo para tu operación inmobiliaria.","","👉 https://drive.google.com/drive/folders/1CiAnmjbzBMe_0hbWo2f1hC8kyv7M6sQm","","🎨 6. MATERIAL PERSONALIZADO","","Te compartiremos tus materiales personalizados para WhatsApp y redes sociales, tarjetas de presentación y promoción de propiedades, según corresponda, la segunda semana de noviembre","","📲 7. ACCESO A BROKTOOL: RECOMENDACIONES","","Ingresa primero a la plataforma web con las credenciales indicadas y después descarga la aplicación móvil para iniciar sesión con los mismos datos.","","👀 Importante: Estamos trabajando en la mejora continua de nuestra plataforma web para ofrecerte una mejor experiencia. 🙌 Te pedimos un poquito de paciencia mientras seguimos haciendo ajustes. 🚀 Próximamente te compartiremos cómo reportar cualquier detalle a nuestro equipo de soporte para que podamos darle seguimiento. ¡Gracias por tu comprensión! 💚","","🎓 8. INDUCCIÓN INICIAL","","Te orientaremos sobre las herramientas, los formatos y las capacitaciones disponibles para que puedas aprovechar los beneficios de la red.","","¡Nos da mucho gusto tenerte en Brokers Network! Estamos listas para crecer y hacer negocios en equipo. 🏡🤝✨"].join("\n");
   }
   var LIGA_CONVENIO="https://docs.google.com/document/d/1iLJAYRG-JwfumM5pAalN3b-Rc-952Vdx/edit?usp=sharing";
   function saludo(r){var p=String(r.nombre||"").trim().split(/\s+/)[0];return "Hola"+(p?" "+p:"")+"! "}
@@ -425,6 +439,25 @@ textarea.campo{min-height:80px;resize:vertical}
     if(hecho&&u)u();
   }
   $('migr').onclick=migrarAfiliados;
+
+  function enlAbrir(){
+    if(!lcol){aviso('Inicia sesión en el panel admin.');return}
+    $('enlCampos').innerHTML=GRUPOS.map(function(g){return '<label style="display:flex;flex-direction:column;gap:3px;font-size:.84rem">'+g[1]+'<input class="campo" type="url" data-k="'+g[0]+'" placeholder="https://chat.whatsapp.com/…" value="'+String(ENL[g[0]]||"").replace(/"/g,"&quot;")+'"></label>'}).join("");
+    $('enlAviso').style.display='none';$('enlDlg').showModal();
+  }
+  $('enlBtn').onclick=enlAbrir;
+  $('enlCancelar').onclick=function(){$('enlDlg').close()};
+  $('enlForm').onsubmit=function(e){
+    e.preventDefault();
+    var campos=[].slice.call($('enlCampos').querySelectorAll('input[data-k]')),malo=null;
+    campos.forEach(function(i){var v=i.value.trim();if(v&&!/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]+/.test(v))malo=i});
+    if(malo){var a=$('enlAviso');a.textContent='Revisa ese enlace: debe empezar con https://chat.whatsapp.com/';a.style.display='block';malo.focus();return}
+    var b=$('enlGuardar');b.disabled=true;
+    Promise.all(campos.map(function(i){var k=i.dataset.k,g=GRUPOS.filter(function(x){return x[0]===k})[0];return lcol.doc(k).set({nombre:g[1],url:i.value.trim()})}))
+      .then(function(){$('enlDlg').close();aviso('Enlaces guardados.');setTimeout(function(){aviso('')},2500)})
+      .catch(function(){var a=$('enlAviso');a.textContent='No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.';a.style.display='block'})
+      .then(function(){b.disabled=false});
+  };
   $('imp').onclick=function(){$('impFile').click()};
   $('impFile').onchange=function(){var f=this.files&&this.files[0];this.value="";if(f)importar(f)};
 
@@ -434,6 +467,8 @@ textarea.campo{min-height:80px;resize:vertical}
   use('db').then(function(d){
     if(!d){$('list').innerHTML='<p class="vacio">Inicia sesión en el panel admin para ver el tracker.</p>';renderChips();return}
     db=d;col=db.collection('prospectos');
+    lcol=db.collection('links');
+    lcol.onSnapshot(function(s){ENL={};s.docs.forEach(function(x){ENL[x.id]=String(x.data().url||"")})},function(){});
     col.orderBy('creado','desc').onSnapshot(function(s){rows=s.docs.map(function(x){var o=Object.assign({},x.data());o.id=x.id;return o});render()},function(){aviso('Se perdió la conexión con el tracker. Recarga la página.')});
   });
 })();
