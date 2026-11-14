@@ -64,19 +64,16 @@ label{display:grid;gap:6px;font-weight:700;font-size:13.5px;margin-bottom:12px}
 <script src="js/bn-datos.js?v=20261018b"></script>
 <script>
 (function(){
-  var H="39064e751935fb908b4a0bb61a6921af55bed2daa57df41bf41152c5c912a631",K='bn-admin-ok';
+  var K='bn-admin-ok';
   var $=function(id){return document.getElementById(id)};
   $('tHoja').href=BN.hoja;
-  if(!BN.conectado()){document.querySelector('a[href="admin-afiliaciones.html"]').href='https://claude.ai/artifact/19rgvVkdtZV8TnSoPUfzPB';document.querySelector('a[href="admin-operaciones.html"]').href='https://claude.ai/artifact/SS5czeuLrVWcVn6LgbhqmM';}
   function ok(){$('login').hidden=true;$('panel').hidden=false;$('sinHoja').hidden=BN.conectado();}
   try{sessionStorage.removeItem(K);if(BN.sesion())ok();}catch(e){}
-  async function sha(t){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
-  $('login').addEventListener('submit',async function(ev){ev.preventDefault();
+  $('login').addEventListener('submit',function(ev){ev.preventDefault();
     var u=$('u').value.trim(),p=$('p').value,b=$('login').querySelector('button[type=submit]');$('e').hidden=true;
     if(BN.conectado()){b.disabled=true;b.textContent='Entrando…';
       BN.entrar(u,p).then(ok,function(err){$('e').textContent=err.message||'No se pudo entrar.';$('e').hidden=false;}).finally(function(){b.disabled=false;b.textContent='Entrar';});return;}
-    var h=await sha('bn-admin|'+u+'|'+p);
-    if(h===H){try{sessionStorage.setItem(K,H)}catch(e){}ok();}else{$('e').hidden=false;}});
+    $('e').textContent='El panel no está conectado a la hoja. Avisa a quien administra el sitio.';$('e').hidden=false;});
   $('salir').addEventListener('click',function(){BN.salir();location.reload();});
   setInterval(function(){if(!$('panel').hidden&&!BN.sesion())location.reload();},30000);
 })();
